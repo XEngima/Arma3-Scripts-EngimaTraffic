@@ -1,5 +1,5 @@
 ------------------------------------
- - ENGIMA'S TRAFFIC (VERSION 1.4) -
+ - ENGIMA'S TRAFFIC (VERSION 1.42) -
 ------------------------------------
 
 Engima's Traffic is a set of scripts that adds traffic to an Arma 3 mission.
@@ -16,6 +16,7 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 
 --- VERSION HISTORY ---
 
+1.42:   Changed colors on debug markers to match unit's side.
 1.4:    Added support for headless clients.
 1.3.1:  Script no longer tries to terminate scripts that were started in spawn callback.
 1.3:    Possibility to select areas (markers) where the traffic will be.

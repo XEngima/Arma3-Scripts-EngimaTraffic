@@ -17,7 +17,9 @@ _parameters = [
 	["MAX_SPAWN_DISTANCE", 1200],
 	["MIN_SKILL", 0.4],
 	["MAX_SKILL", 0.6],
-	["DEBUG", false]
+	["AREA_MARKER", "trafficMarker"],
+	["HIDE_AREA_MARKER", true],
+	["DEBUG", true]
 ];
 
 // Start an instance of the traffic

@@ -140,25 +140,24 @@ ENGIMA_TRAFFIC_MoveVehicle = {
 };
 
 ENGIMA_TRAFFIC_StartTraffic = {
-	private ["_side", "_vehicleCount", "_minSpawnDistance", "_maxSpawnDistance", "_minSkill", "_maxSkill", "_areaMarkerName", "_hideAreaMarker", "_debug"];
-	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehiclesAndGroup", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_possibleVehicles", "_vehicleType", "_vehiclesCrew", "_skill", "_minDistance", "_tries", "_trafficLocation"];
+	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehiclesAndGroup", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleType", "_vehiclesCrew", "_skill", "_minDistance", "_tries", "_trafficLocation"];
 	private ["_currentEntityNo", "_vehicleVarName", "_tempVehiclesAndGroup", "_deletedVehiclesCount", "_firstIteration", "_roadSegments", "_destinationSegment", "_destinationPos", "_direction"];
 	private ["_roadSegmentDirection", "_testDirection", "_facingAway", "_posX", "_posY", "_pos", "_currentInstanceIndex"];
-	private ["_fnc_OnSpawnVehicle", "_fnc_OnRemoveVehicle", "_fnc_FindSpawnSegment"];
+	private ["_fnc_FindSpawnSegment"];
 	private ["_debugMarkerName"];
 
-	_side = [_this, "SIDE", civilian] call ENGIMA_TRAFFIC_GetParamValue;
-	_possibleVehicles = [_this, "VEHICLES", ["C_Offroad_01_F", "C_Offroad_01_repair_F", "C_Quadbike_01_F", "C_Hatchback_01_F", "C_Hatchback_01_sport_F", "C_SUV_01_F", "C_Van_01_transport_F", "C_Van_01_box_F", "C_Van_01_fuel_F"]] call ENGIMA_TRAFFIC_GetParamValue;
-	_vehicleCount = [_this, "VEHICLES_COUNT", 10] call ENGIMA_TRAFFIC_GetParamValue;
-	_minSpawnDistance = [_this, "MIN_SPAWN_DISTANCE", 800] call ENGIMA_TRAFFIC_GetParamValue;
-	_maxSpawnDistance = [_this, "MAX_SPAWN_DISTANCE", 1200] call ENGIMA_TRAFFIC_GetParamValue;
-	_minSkill = [_this, "MIN_SKILL", 0.3] call ENGIMA_TRAFFIC_GetParamValue;
-	_maxSkill = [_this, "MAX_SKILL", 0.7] call ENGIMA_TRAFFIC_GetParamValue;
-	_areaMarkerName = [_this, "AREA_MARKER", ""] call ENGIMA_TRAFFIC_GetParamValue;
-	_hideAreaMarker = [_this, "HIDE_AREA_MARKER", true] call ENGIMA_TRAFFIC_GetParamValue;
-	_fnc_OnSpawnVehicle = [_this, "ON_SPAWN_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
-	_fnc_OnRemoveVehicle = [_this, "ON_REMOVE_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
-	_debug = [_this, "DEBUG", false] call ENGIMA_TRAFFIC_GetParamValue;
+	private _side = [_this, "SIDE", civilian] call ENGIMA_TRAFFIC_GetParamValue;
+	private _possibleVehicles = [_this, "VEHICLES", ["C_Offroad_01_F", "C_Offroad_01_repair_F", "C_Quadbike_01_F", "C_Hatchback_01_F", "C_Hatchback_01_sport_F", "C_SUV_01_F", "C_Van_01_transport_F", "C_Van_01_box_F", "C_Van_01_fuel_F"]] call ENGIMA_TRAFFIC_GetParamValue;
+	private _vehicleCount = [_this, "VEHICLES_COUNT", 10] call ENGIMA_TRAFFIC_GetParamValue;
+	private _minSpawnDistance = [_this, "MIN_SPAWN_DISTANCE", 800] call ENGIMA_TRAFFIC_GetParamValue;
+	private _maxSpawnDistance = [_this, "MAX_SPAWN_DISTANCE", 1200] call ENGIMA_TRAFFIC_GetParamValue;
+	private _minSkill = [_this, "MIN_SKILL", 0.3] call ENGIMA_TRAFFIC_GetParamValue;
+	private _maxSkill = [_this, "MAX_SKILL", 0.7] call ENGIMA_TRAFFIC_GetParamValue;
+	private _areaMarkerName = [_this, "AREA_MARKER", ""] call ENGIMA_TRAFFIC_GetParamValue;
+	private _hideAreaMarker = [_this, "HIDE_AREA_MARKER", true] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_OnSpawnVehicle = [_this, "ON_SPAWN_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_OnRemoveVehicle = [_this, "ON_REMOVE_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _debug = [_this, "DEBUG", false] call ENGIMA_TRAFFIC_GetParamValue;
 	
 	if (_areaMarkerName != "" && _hideAreaMarker) then {
 		_areaMarkerName setMarkerAlpha 0;
@@ -511,16 +510,16 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		            
 		            _debugMarkerColor = "Default";
 		            if (_side == west) then {
-		                _debugMarkerColor = "ColorBlue";
+		                _debugMarkerColor = "ColorBlufor";
 		            };
 		            if (_side == east) then {
-		                _debugMarkerColor = "ColorRed";
+		                _debugMarkerColor = "ColorOpfor";
 		            };
 		            if (_side == civilian) then {
-		                _debugMarkerColor = "ColorYellow";
+		                _debugMarkerColor = "ColorCivilian";
 		            };
 		            if (_side == resistance) then {
-		                _debugMarkerColor = "ColorGreen";
+		                _debugMarkerColor = "ColorIndependent";
 		            };
 		            
 		            [_debugMarkerName, getPos (_vehicle), "mil_dot", _debugMarkerColor, "Traffic"] call ENGIMA_TRAFFIC_SetDebugMarkerAllClients;
