@@ -149,6 +149,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	private _side = [_this, "SIDE", civilian] call ENGIMA_TRAFFIC_GetParamValue;
 	private _possibleVehicles = [_this, "VEHICLES", ["C_Offroad_01_F", "C_Offroad_01_repair_F", "C_Quadbike_01_F", "C_Hatchback_01_F", "C_Hatchback_01_sport_F", "C_SUV_01_F", "C_Van_01_transport_F", "C_Van_01_box_F", "C_Van_01_fuel_F"]] call ENGIMA_TRAFFIC_GetParamValue;
 	private _vehicleCount = [_this, "VEHICLES_COUNT", 10] call ENGIMA_TRAFFIC_GetParamValue;
+	private _maxGroupsCount = [_this, "MAX_GROUPS_COUNT", 0] call ENGIMA_TRAFFIC_GetParamValue;
 	private _minSpawnDistance = [_this, "MIN_SPAWN_DISTANCE", 800] call ENGIMA_TRAFFIC_GetParamValue;
 	private _maxSpawnDistance = [_this, "MAX_SPAWN_DISTANCE", 1200] call ENGIMA_TRAFFIC_GetParamValue;
 	private _minSkill = [_this, "MIN_SKILL", 0.3] call ENGIMA_TRAFFIC_GetParamValue;
@@ -166,6 +167,10 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		_areaMarkerName setMarkerAlpha 0;
 	};
 	
+	if (_maxGroupsCount < _vehicleCount) then {
+		_maxGroupsCount = _vehicleCount;
+	};
+	
 	sleep random 1;
 	
 	ENGIMA_TRAFFIC_instanceIndex = ENGIMA_TRAFFIC_instanceIndex + 1;
@@ -176,6 +181,8 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	ENGIMA_TRAFFIC_roadSegments set [_currentInstanceIndex, []];
 	
 	_activeVehicles = [];
+	
+	// #Region Function FindSpawnSegment
 	
 	_fnc_FindSpawnSegment = {
 	    private ["_currentInstanceIndex", "_allPlayerPositions", "_minSpawnDistance", "_maxSpawnDistance", "_activeVehicles"];
@@ -272,6 +279,8 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	
 	    _result
 	};
+	
+	// #endregion
 	
 	_firstIteration = true;
 	

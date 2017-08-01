@@ -1,5 +1,5 @@
 ------------------------------------
- - ENGIMA'S TRAFFIC (VERSION 1.44) -
+ - ENGIMA'S TRAFFIC (VERSION 1.5) -
 ------------------------------------
 
 Engima's Traffic is a set of scripts that adds traffic to an Arma 3 mission.
@@ -52,6 +52,7 @@ _parameters = [
 	["SIDE", civilian],
 	["VEHICLES", ["C_Offroad_01_F", "C_Offroad_01_repair_F", "C_Quadbike_01_F", "C_Hatchback_01_F", "C_Hatchback_01_sport_F", "C_SUV_01_F", "C_Van_01_transport_F", "C_Van_01_box_F", "C_Van_01_fuel_F"]],
 	["VEHICLES_COUNT", 10],
+	["MAX_GROUPS_COUNT", 0],
 	["MIN_SPAWN_DISTANCE", 800],
 	["MAX_SPAWN_DISTANCE", 1200],
 	["MIN_SKILL", 0.4],
@@ -78,23 +79,33 @@ Here is a complete list of the parameters and what they do:
   are quadbikes and 25% is transports:
   Example: ["C_Quadbike_01_F", "C_Quadbike_01_F", "C_Quadbike_01_F", "C_Van_01_transport_F"]
   
-* VEHICLES_COUNT (Number): Number of vehicles that exists on the map for the current traffic instance.
-  Example: If VEHICLES_COUNT is set to 10 and MAX_SPAWN_DISTANCE is set to 1000, then there will be 10 vehicles on an area 
-  of 3142 square meters (1000 * pi).
+* VEHICLES_COUNT (Scalar): Number of moving vehicles that exists on the map for the current traffic instance. If
+  a vehicle is damage to a degree that it cannot move (!canMove vehicle), then it will not be counted, and a new 
+  vehicle will be created. But only if allowed by MAX_GROUPS_COUNT (se below).
+  Example: If VEHICLES_COUNT is set to 10, MAX_GROUPS_COUNT set to 15, and MAX_SPAWN_DISTANCE is set to 1000, then 
+  there will be 10 vehicles on an area of 3142 square meters (1000 * pi). If one of them gets damaged so it cannot 
+  move, then an 11th will be spawned (up to 15).
 
-* MIN_SPAWN_DISTANCE (Number): Minimum spawn distance in meters from nearest human player on the map. Should be at least 100 
+* MAX_GROUPS_COUNT (Scalar): Maximum number of groups that the script will ever have created at the same time. If set
+  to 0 (default) then the VEHICLES_COUNT value will be used. Must be set to 0 or a value greater than or equal to 
+  VEHICLES_COUNT. If set to a value greater than VEHICLES_COUNT, then the script is given the possibility to spawn in 
+  new vehicles when one is damaged to a degree when it cannot move. (See also VEHICLES_COUNT above.)
+  Example: If VEHICLES_COUNT is set to 10 and MAX_GROUPS_COUNT is set to 15, and all ten vehicles is destroyed. Then
+  the script will spawn in 5 new vehicles.
+
+* MIN_SPAWN_DISTANCE (Scalar): Minimum spawn distance in meters from nearest human player on the map. Should be at least 100 
   meters less than MAX_SPAWN_DISTANCE.
   Example: 800
 
-* MAX_SPAWN_DISTANCE (Number): Maximum spawn distance in meters from nearest player on the map. Vehicles beyond this 
+* MAX_SPAWN_DISTANCE (Scalar): Maximum spawn distance in meters from nearest player on the map. Vehicles beyond this 
   distance will be removed. Should be at least 100 meters greater than MIN_SPAWN_DISTANCE.
   Example: 1200
   
-* MIN_SKILL (Number): Vehicle crew's minimum skill. Must be between 0 and 1 and less than or equal to MAX_SKILL. Actual 
+* MIN_SKILL (Scalar): Vehicle crew's minimum skill. Must be between 0 and 1 and less than or equal to MAX_SKILL. Actual 
   skill of each spawned vehicle (and crew) will be a random number between MIN_SKILL and MAX_SKILL.
   Example: 0.4
 
-* MAX_SKILL (Number): Vehicle crew's maximum skill. Must be between 0 and 1 and greater than or equal to MIN_SKILL. Actual 
+* MAX_SKILL (Scalar): Vehicle crew's maximum skill. Must be between 0 and 1 and greater than or equal to MIN_SKILL. Actual 
   skill of each spawned vehicle (and crew) will be a random number between MIN_SKILL and MAX_SKILL.
   Example: 0.6
   
