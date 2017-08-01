@@ -140,8 +140,8 @@ ENGIMA_TRAFFIC_MoveVehicle = {
 };
 
 ENGIMA_TRAFFIC_StartTraffic = {
-	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehiclesAndGroup", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleType", "_vehiclesCrew", "_skill", "_minDistance", "_tries", "_trafficLocation"];
-	private ["_currentEntityNo", "_vehicleVarName", "_tempVehiclesAndGroup", "_deletedVehiclesCount", "_firstIteration", "_roadSegments", "_destinationSegment", "_destinationPos", "_direction"];
+	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehicles", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleClassName", "_vehiclesCrew", "_skill", "_minDistance", "_tries", "_trafficLocation"];
+	private ["_currentEntityNo", "_vehicleVarName", "_tempVehicles", "_deletedVehiclesCount", "_firstIteration", "_roadSegments", "_destinationSegment", "_destinationPos", "_direction"];
 	private ["_roadSegmentDirection", "_testDirection", "_facingAway", "_posX", "_posY", "_pos", "_currentInstanceIndex"];
 	private ["_fnc_FindSpawnSegment"];
 	private ["_debugMarkerName"];
@@ -155,8 +155,11 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	private _maxSkill = [_this, "MAX_SKILL", 0.7] call ENGIMA_TRAFFIC_GetParamValue;
 	private _areaMarkerName = [_this, "AREA_MARKER", ""] call ENGIMA_TRAFFIC_GetParamValue;
 	private _hideAreaMarker = [_this, "HIDE_AREA_MARKER", true] call ENGIMA_TRAFFIC_GetParamValue;
-	private _fnc_OnSpawnVehicle = [_this, "ON_SPAWN_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
-	private _fnc_OnRemoveVehicle = [_this, "ON_REMOVE_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_onUnitCreating = [_this, "ON_UNIT_CREATING", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_onUnitCreated = [_this, "ON_UNIT_CREATING", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_onUnitRemoving = [_this, "ON_UNIT_CREATING", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_onSpawnVehicleObsolete = [_this, "ON_SPAWN_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_onRemoveVehicleObsolete = [_this, "ON_REMOVE_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
 	private _debug = [_this, "DEBUG", false] call ENGIMA_TRAFFIC_GetParamValue;
 	
 	if (_areaMarkerName != "" && _hideAreaMarker) then {
@@ -172,17 +175,17 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	ENGIMA_TRAFFIC_edgeRoadsUseful set [_currentInstanceIndex, false];
 	ENGIMA_TRAFFIC_roadSegments set [_currentInstanceIndex, []];
 	
-	_activeVehiclesAndGroup = [];
+	_activeVehicles = [];
 	
 	_fnc_FindSpawnSegment = {
-	    private ["_currentInstanceIndex", "_allPlayerPositions", "_minSpawnDistance", "_maxSpawnDistance", "_activeVehiclesAndGroup"];
+	    private ["_currentInstanceIndex", "_allPlayerPositions", "_minSpawnDistance", "_maxSpawnDistance", "_activeVehicles"];
 	    private ["_insideMarker", "_areaMarkerName", "_refPlayerPos", "_roadSegments", "_roadSegment", "_isOk", "_tries", "_result", "_spawnDistanceDiff", "_refPosX", "_refPosY", "_dir", "_tooFarAwayFromAll", "_tooClose", "_tooCloseToAnotherVehicle"];
 		
 		_currentInstanceIndex = _this select 0;
 	    _allPlayerPositions = _this select 1;
 	    _minSpawnDistance = _this select 2;
 	    _maxSpawnDistance = _this select 3;
-	    _activeVehiclesAndGroup = _this select 4;
+	    _activeVehicles = _this select 4;
 	    
 	    _spawnDistanceDiff = _maxSpawnDistance - _minSpawnDistance;
 	    _roadSegment = "NULL";
@@ -242,7 +245,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	                    };
 	                    
 	                    sleep 0.01;
-	                } foreach _activeVehiclesAndGroup;
+	                } foreach _activeVehicles;
 				};
 		                
 	            _isOk = true;
@@ -278,7 +281,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	
 	while {true} do {
 	    scopeName "mainScope";
-	    private ["_sleepSeconds", "_correctedVehicleCount", "_markerSize", "_avgMarkerRadius", "_coveredShare", "_restDistance", "_coveredAreaShare"];
+	    private ["_sleepSeconds", "_calculatedMaxVehicleCount", "_markerSize", "_avgMarkerRadius", "_coveredShare", "_restDistance", "_coveredAreaShare"];
 
 		_allPlayerPositionsTemp = [];
 		if (isMultiplayer) then {
@@ -299,14 +302,14 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	    // If there are few vehicles, add a vehicle
 	    
 	    if (_areaMarkerName == "") then {
-		    _correctedVehicleCount = _vehicleCount;
+		    _calculatedMaxVehicleCount = _vehicleCount;
 	    }
 	    else {
 	    	_markerSize = getMarkerSize _areaMarkerName;
 	    	_avgMarkerRadius = ((_markerSize select 0) + (_markerSize select 1)) / 2;
 
 			if (_avgMarkerRadius > _maxSpawnDistance) then {
-			    _correctedVehicleCount = floor (_vehicleCount / 2);
+			    _calculatedMaxVehicleCount = floor (_vehicleCount / 2);
 		    	_coveredShare = 0;
 		    	
 			    {
@@ -319,15 +322,15 @@ ENGIMA_TRAFFIC_StartTraffic = {
 				    sleep 0.01;
 			    } foreach (_allPlayerPositions);
 			    
-			    _correctedVehicleCount = floor (_vehicleCount * _coveredShare);
+			    _calculatedMaxVehicleCount = floor (_vehicleCount * _coveredShare);
 	    	}
 	    	else {
-	    		_correctedVehicleCount = _vehicleCount;
+	    		_calculatedMaxVehicleCount = _vehicleCount;
 	    	};
 	    };
 	
 	    _tries = 0;
-	    while {count _activeVehiclesAndGroup < _correctedVehicleCount && _tries < 1} do {
+	    while {count _activeVehicles < _calculatedMaxVehicleCount && _tries < 1} do {
 			sleep 0.1;
 			
 	        // Get all spawn positions within range
@@ -342,7 +345,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	            _minDistance = _minSpawnDistance;
 	        };
 	        
-	        _spawnSegment = [_currentInstanceIndex, _allPlayerPositions, _minDistance, _maxSpawnDistance, _activeVehiclesAndGroup] call _fnc_FindSpawnSegment;
+	        _spawnSegment = [_currentInstanceIndex, _allPlayerPositions, _minDistance, _maxSpawnDistance, _activeVehicles] call _fnc_FindSpawnSegment;
 	        
 	        // If there were spawn positions
 	        if (str _spawnSegment != """NULL""") then {
@@ -406,51 +409,91 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	            _pos = [_posX, _posY, 0];
 	            
 	            // Create vehicle
-	            _vehicleType = _possibleVehicles select floor (random count _possibleVehicles);
-	            _result = [_pos, _direction, _vehicleType, _side] call BIS_fnc_spawnVehicle;
-	            _vehicle = _result select 0;
-	            _vehiclesCrew = _result select 1;
-	            _vehiclesGroup = _result select 2;
+	            _vehicleClassName = selectRandom _possibleVehicles;
 	            
-	            // Name vehicle
-	            sleep random 0.1;
-	            if (isNil "dre_MilitaryTraffic_CurrentEntityNo") then {
-	                dre_MilitaryTraffic_CurrentEntityNo = 0
-	            };
+	            private _spawnArgs = [_pos, _vehicleClassName];
+	            private _goOnWithSpawn = [_spawnArgs, count _activeVehicles, _calculatedMaxVehicleCount] call _fnc_onUnitCreating;
 	            
-	            _currentEntityNo = dre_MilitaryTraffic_CurrentEntityNo;
-	            dre_MilitaryTraffic_CurrentEntityNo = dre_MilitaryTraffic_CurrentEntityNo + 1;
+	            // Retrieve the possibly altered values
+	            _pos = _spawnArgs select 0;
+	            _vehicleClassName = _spawnArgs select 1;
 	            
-	            _vehicleVarName = "dre_MilitaryTraffic_Entity_" + str _currentEntityNo;
-	            _vehicle setVehicleVarName _vehicleVarName;
-	            _vehicle call compile format ["%1=_this;", _vehicleVarName];
-	            sleep 0.01;
-	            
-	            // Set crew skill
-	            {
-	                _skill = _minSkill + random (_maxSkill - _minSkill);
-	                _x setSkill _skill;
+                // If the user has not messed something up, use the edited class list
+                private _userMessedUp = false;
+                private _logMsg = "";
+                if (count _spawnArgs != 2) then {
+                    _userMessedUp = true;
+                    _logMsg = "Engima.Traffic: Error - Altered params array in ON_UNIT_CREATING has wrong number of items. Should be 2.";
+                };
+                if (isNil "_pos" || { !(_pos isEqualTypeArray [0,0] || _pos isEqualTypeArray [0,0,0]) }) then {
+                    _pos = [0,0,0];
+                    _userMessedUp = true;
+                    _logMsg = "Engima.Traffic: Error - Altered parameter 0 in ON_UNIT_CREATING is not a position. Must be on format [0,0,0]";
+                };
+                if (isNil "_vehicleClassName" || { !(typeName _vehicleClassName == "String") }) then {
+                    _vehicleClassName = "";
+                    _userMessedUp = true;
+                    _logMsg = "Engima.Traffic: Error - Altered parameter 1 in ON_UNIT_CREATING is not an array. Must be an array with unit class names.";
+                };
+                
+                if (isNil "_goOnWithSpawn") then {
+                    _goOnWithSpawn = false;
+                    _userMessedUp = true;
+                    _logMsg = "Engima.Traffic: Error - Return value of callback ON_UNIT_CREATING is nil. Must be true or false.";
+                };
+                
+                if (_userMessedUp) then {
+                    diag_log _logMsg;
+                    player sideChat _logMsg;
+                };
+                
+				if (_goOnWithSpawn && { _vehicleClassName != "" } && { !_userMessedUp }) then {
+		            _result = [_pos, _direction, _vehicleClassName, _side] call BIS_fnc_spawnVehicle;
+		            _vehicle = _result select 0;
+		            _vehiclesCrew = _result select 1;
+		            _vehiclesGroup = _result select 2;
+		            
+		            // Name vehicle
+		            sleep random 0.1;
+		            if (isNil "dre_MilitaryTraffic_CurrentEntityNo") then {
+		                dre_MilitaryTraffic_CurrentEntityNo = 0
+		            };
+		            
+		            _currentEntityNo = dre_MilitaryTraffic_CurrentEntityNo;
+		            dre_MilitaryTraffic_CurrentEntityNo = dre_MilitaryTraffic_CurrentEntityNo + 1;
+		            
+		            _vehicleVarName = "dre_MilitaryTraffic_Entity_" + str _currentEntityNo;
+		            _vehicle setVehicleVarName _vehicleVarName;
+		            _vehicle call compile format ["%1=_this;", _vehicleVarName];
 		            sleep 0.01;
-	            } foreach _vehiclesCrew;
-	            
-	            _debugMarkerName = "dre_MilitaryTraffic_DebugMarker" + str _currentEntityNo;
-	            
-	            // Start vehicle
-	            [_currentInstanceIndex, _vehicle, _destinationPos, _debug] spawn ENGIMA_TRAFFIC_MoveVehicle;
-	            _activeVehiclesAndGroup pushBack [_vehicle, _vehiclesGroup, _vehiclesCrew, _debugMarkerName];
-	            sleep 0.01;
-	            
-	            // Run spawn script and attach handle to vehicle
-	            _vehicle setVariable ["dre_scriptHandle", _result spawn _fnc_OnSpawnVehicle];
-	        };
-	        
+		            
+		            // Set crew skill
+		            {
+		                _skill = _minSkill + random (_maxSkill - _minSkill);
+		                _x setSkill _skill;
+			            sleep 0.01;
+		            } foreach _vehiclesCrew;
+		            
+		            _debugMarkerName = "dre_MilitaryTraffic_DebugMarker" + str _currentEntityNo;
+		            
+		            // Start vehicle
+		            [_currentInstanceIndex, _vehicle, _destinationPos, _debug] spawn ENGIMA_TRAFFIC_MoveVehicle;
+		            _activeVehicles pushBack [_vehicle, _vehiclesGroup, _vehiclesCrew, _debugMarkerName];
+		            sleep 0.01;
+		            
+		            // Run spawn callbacks
+		            [_vehicle, _vehiclesGroup, count _activeVehicles, _calculatedMaxVehicleCount] call _fnc_OnUnitCreated;
+		            _result spawn _fnc_OnSpawnVehicleObsolete;
+		        };
+			};
+			
             _tries = _tries + 1;
 	    };
 	    
 	    _firstIteration = false;
 	
 		// If any vehicle is too far away, delete it
-	    _tempVehiclesAndGroup = [];
+	    _tempVehicles = [];
 	    _deletedVehiclesCount = 0;
 		{
 	        private ["_closestUnitDistance", "_distance", "_crewUnits"];
@@ -473,11 +516,12 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	        } foreach _allPlayerPositions;
 	        
 	        if (_closestUnitDistance < _maxSpawnDistance) then {
-	            _tempVehiclesAndGroup pushBack _x;
+	            _tempVehicles pushBack _x;
 	        }
 	        else {
-	            // Run callback before deleting
-	            _vehicle call _fnc_OnRemoveVehicle;
+	            // Run callback before removing
+	            [_vehicle, _vehiclesGroup, (count _activeVehicles) - _deletedVehiclesCount, _calculatedMaxVehicleCount] call _fnc_onUnitRemoving;
+	            _vehicle call _fnc_OnRemoveVehicleObsolete;
 	            
 	            // Delete crew
 	            {
@@ -492,9 +536,9 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	        };
 	        
             sleep 0.01;
-		} foreach _activeVehiclesAndGroup;
+		} foreach _activeVehicles;
 	    
-	    _activeVehiclesAndGroup = _tempVehiclesAndGroup;
+	    _activeVehicles = _tempVehicles;
 	    
 	    // Do nothing but update debug markers for X seconds
 	    _sleepSeconds = 5;
@@ -524,7 +568,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		            
 		            [_debugMarkerName, getPos (_vehicle), "mil_dot", _debugMarkerColor, "Traffic"] call ENGIMA_TRAFFIC_SetDebugMarkerAllClients;
 		            
-		        } foreach _activeVehiclesAndGroup;
+		        } foreach _activeVehicles;
 		    
 		    	sleep 1;
 		    };

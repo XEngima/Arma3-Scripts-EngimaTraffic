@@ -1,5 +1,5 @@
 ------------------------------------
- - ENGIMA'S TRAFFIC (VERSION 1.42) -
+ - ENGIMA'S TRAFFIC (VERSION 1.44) -
 ------------------------------------
 
 Engima's Traffic is a set of scripts that adds traffic to an Arma 3 mission.
@@ -16,6 +16,9 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 
 --- VERSION HISTORY ---
 
+1.5:    Added callback ON_UNIT_CREATING that is fired right before a vehicle spawns.
+        Replaced callback ON_SPAWN_CALLBACK with ON_UNIT_CREATED.
+        Replaced callback ON_REMOVE_CALLBACK with ON_UNIT_REMOVING.
 1.42:   Changed colors on debug markers to match unit's side.
 1.4:    Added support for headless clients.
 1.3.1:  Script no longer tries to terminate scripts that were started in spawn callback.
@@ -55,9 +58,12 @@ _parameters = [
 	["MAX_SKILL", 0.6],
 	["AREA_MARKER", "EnemyMarker1"],
 	["HIDE_AREA_MARKER", true],
-	["ON_SPAWN_CALLBACK", { hint ("Vehicle of type " + typeOf (_this select 0) + " created!")],
-	["ON_REMOVE_CALLBACK", { hint "Vehicle of type " + typename _this + " removed!"; }],
-	["DEBUG", true]
+	["ON_UNIT_CREATING", { true }],
+	["ON_UNIT_CREATED", {}],
+	["ON_UNIT_REMOVING", {}],
+	["ON_SPAWN_CALLBACK", {}],  // Obsolete! Use ON_UNIT_CREATED instead.
+	["ON_REMOVE_CALLBACK", {}], // Obsolete! Use ON_UNIT_REMOVING instead.
+	["DEBUG", false]
 ];
 
 // Start an instance of the traffic
@@ -102,13 +108,39 @@ Here is a complete list of the parameters and what they do:
 * HIDE_AREA_MARKER (Boolean): Wether the area marker should be hidden or not. If true then the marker will be hidden on 
   the map for the players, otherwise it will be visible. Default value is true.
 
-* ON_SPAWN_CALLBACK (Code): Code that is executed when a vehicle has spawned. Parameter _this is an array: 0: created 
-  vehicle (Object), 1: all crew (Array of Objects), 2: vehicle's group (Group). Default value is {}.
+* ON_UNIT_CREATING (Code): Callback that is executed right before a vehicle spawns. Return true to go on with
+  the vehicle spawn. Return false to prohibit the spawn. Parameter _this is an array with the following items:
+    0 (Array): An array with spawn arguments. This array can be manipulated. Change the first item to spawn on 
+    another position, and change the second parameter to spawn a vehicle of another class than suggested. The spawn
+    arguments array is specified like this:
+      0 (Array): The position where the vehicle is suggested to spawn (can be modified).
+      1 (String): The classname for the vehicle to spawn (can be modified).
+    1 (Scalar): Number of vehicles spawned and currently controlled by the script.
+    2 (Scalar): Calculated maximun number of civilians that the script will try to spawn (depends on spwn markers
+    etc.).
+  The example below will not spawn traffic during the night:
+  Example: { private _goOnWithSpawn = (dayTime > 8 && dayTime < 22); _goOnWithSpawn )
+
+* ON_UNIT_CREATED (Code): Code that is executed when a vehicle has spawned. Parameter _this is an array:
+    0 (Object): The vehicle that was created.
+    1 (Group): The group that the vehicle belongs to.
+    2 (Scalar): Number of vehicles spawned and currently controlled by the script.
+    3 (Scalar): Calculated maximun number of units that the script will try to spawn (depends on spwn markers
+    etc.).
   Example: { hint ("Vehicle of type " + typeOf (_this select 0) + " created!")
 
-* ON_REMOVE_CALLBACK (Code): Code that is executed just before a vehicle is removed. Vehicle is sent in as a parameter _this.
-  Default value is {}.
-  Example: { hint "Vehicle of type " + typename _this + " removed!"; }
+* ON_UNIT_REMOVING (Code): Code that is executed just before a vehicle and its group is being removed. Vehicle is 
+  sent in as a parameter _this.
+    0 (Object): The vehicle that will be removed.
+    1 (Group): The group that the vehicle belongs to.
+    2 (Scalar): Number of vehicles spawned and currently controlled by the script.
+    3 (Scalar): Calculated maximun number of units that the script will try to spawn (depends on spwn markers
+    etc.).
+  Example: { hint "Vehicle of type " + typename _this + " is being removed!"; }
+
+* ON_SPAWN_CALLBACK (Code): Obsolete! Use ON_UNIT_CREATED instead.
+
+* ON_REMOVE_CALLBACK (Code): Obsolete! Use ON_UNIT_REMOVING instead.
 
 * DEBUG (Boolean): Whether script is running in debug mode or not. In debug mode all vehicles are marked as dots on the map.
   Can be true or false. Default value is false.
