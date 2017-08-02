@@ -7,7 +7,7 @@ ENGIMA_TRAFFIC_FindEdgeRoads = {
 	if (!isNil "ENGIMA_TRAFFIC_edgeRoadsInitializing") exitWith {};
 	ENGIMA_TRAFFIC_edgeRoadsInitializing = true;
 	
-	sleep 2; // Wait for all traffic instances to be registered
+	sleep 3; // Wait for all traffic instances to be registered
 	
 	_worldTrigger = call BIS_fnc_worldArea;
 	_worldSize = triggerArea _worldTrigger;
@@ -140,7 +140,7 @@ ENGIMA_TRAFFIC_MoveVehicle = {
 };
 
 ENGIMA_TRAFFIC_StartTraffic = {
-	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehicles", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleClassName", "_vehiclesCrew", "_skill", "_minDistance", "_tries", "_trafficLocation"];
+	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehicles", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleClassName", "_vehiclesCrew", "_skill", "_minDistance", "_trafficLocation"];
 	private ["_currentEntityNo", "_vehicleVarName", "_tempVehicles", "_deletedVehiclesCount", "_firstIteration", "_roadSegments", "_destinationSegment", "_destinationPos", "_direction"];
 	private ["_roadSegmentDirection", "_testDirection", "_facingAway", "_posX", "_posY", "_pos", "_currentInstanceIndex"];
 	private ["_fnc_FindSpawnSegment"];
@@ -308,8 +308,6 @@ ENGIMA_TRAFFIC_StartTraffic = {
 			_allPlayerPositions = _allPlayerPositionsTemp;
 		};
 	
-	    // If there are few vehicles, add a vehicle
-	    
 	    if (_areaMarkerName == "") then {
 		    _calculatedMaxVehicleCount = _vehicleCount;
 	    }
@@ -338,8 +336,10 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	    	};
 	    };
 	
-	    _tries = 0;
-	    while {count _activeVehicles < _calculatedMaxVehicleCount && _tries < 1} do {
+	    // If there are few vehicles, add a vehicle
+	    // #region Add Vehicle
+	    
+	    while {count _activeVehicles < _calculatedMaxVehicleCount} do {
 			sleep 0.1;
 			
 	        // Get all spawn positions within range
@@ -495,13 +495,13 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		            _result spawn _fnc_OnSpawnVehicleObsolete;
 		        };
 			};
-			
-            _tries = _tries + 1;
 	    };
 	    
-	    _firstIteration = false;
+	    // #endregion
 	
 		// If any vehicle is too far away, delete it
+		// #region Delete Vehicles
+		
 	    _tempVehicles = [];
 	    _deletedVehiclesCount = 0;
 		{
@@ -549,6 +549,8 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	    
 	    _activeVehicles = _tempVehicles;
 	    
+	    // #endregion
+	    
 	    // Do nothing but update debug markers for X seconds
 	    _sleepSeconds = 5;
 	    if (_debug) then {
@@ -585,6 +587,8 @@ ENGIMA_TRAFFIC_StartTraffic = {
     	else {
     		sleep _sleepSeconds;
     	};
+	    
+	    _firstIteration = false;
 	};
 };
 
