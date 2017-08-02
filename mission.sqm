@@ -16,24 +16,23 @@ class EditorData
 	};
 	class Camera
 	{
-		pos[]={7928.4106,52.062668,9525.9082};
-		dir[]={0.42408475,-0.25784042,0.86815399};
-		up[]={0.11319127,0.96617329,0.23171704};
-		aside[]={0.89853388,-1.1728844e-007,-0.4389258};
+		pos[]={7240.0283,145.72298,8569.4248};
+		dir[]={0.42407835,-0.25784042,0.86815655};
+		up[]={0.11318967,0.96617329,0.23171768};
+		aside[]={0.89853644,-1.1728844e-007,-0.4389194};
 	};
 };
 binarizationWanted=0;
 addons[]=
 {
 	"A3_Characters_F",
-	"A3_Air_F_Exp_Plane_Civil_01",
-	"A3_Ui_F"
+	"A3_Air_F_Exp_Plane_Civil_01"
 };
 class AddonsMetaData
 {
 	class List
 	{
-		items=3;
+		items=2;
 		class Item0
 		{
 			className="A3_Characters_F";
@@ -45,13 +44,6 @@ class AddonsMetaData
 		{
 			className="A3_Air_F_Exp";
 			name="Arma 3 Apex - Aircrafts";
-			author="Bohemia Interactive";
-			url="https://www.arma3.com";
-		};
-		class Item2
-		{
-			className="A3_Ui_F";
-			name="Arma 3 - User Interface";
 			author="Bohemia Interactive";
 			url="https://www.arma3.com";
 		};
@@ -84,7 +76,7 @@ class Mission
 	};
 	class Entities
 	{
-		items=4;
+		items=3;
 		class Item0
 		{
 			dataType="Group";
@@ -97,7 +89,7 @@ class Mission
 					dataType="Object";
 					class PositionInfo
 					{
-						position[]={7935.895,31.041439,9560.8281};
+						position[]={7247.5127,116.53966,8604.3447};
 					};
 					side="West";
 					flags=7;
@@ -161,8 +153,8 @@ class Mission
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={7926.5498,32.646225,9564.5889};
-				angles[]={0,0.0033601085,0};
+				position[]={7238.1675,118.75258,8608.1055};
+				angles[]={0.1973955,0.0033601085,6.1393847};
 			};
 			side="Empty";
 			flags=4;
@@ -171,31 +163,20 @@ class Mission
 			};
 			id=6;
 			type="C_Plane_Civil_01_F";
-			atlOffset=-0.00099182129;
+			atlOffset=-0.045227051;
 		};
 		class Item2
 		{
 			dataType="Logic";
 			class PositionInfo
 			{
-				position[]={7980.3491,31.040001,9574.0195};
+				position[]={7291.9668,104.84348,8617.5361};
+				angles[]={0.083803542,0,0.032789111};
 			};
 			name="HC1";
 			isPlayable=1;
 			id=7;
 			type="HeadlessClient_F";
-		};
-		class Item3
-		{
-			dataType="Marker";
-			position[]={7142.957,0,8804.0586};
-			name="trafficMarker";
-			markerType="RECTANGLE";
-			type="rectangle";
-			a=1000;
-			b=1000;
-			id=8;
-			atlOffset=-101.52671;
 		};
 	};
 };

@@ -13,12 +13,15 @@ _parameters = [
 	["SIDE", civilian],
 	["VEHICLES", ["C_Offroad_01_F", "C_Offroad_01_repair_F", "C_Quadbike_01_F", "C_Hatchback_01_F", "C_Hatchback_01_sport_F", "C_SUV_01_F", "C_Van_01_transport_F", "C_Van_01_box_F", "C_Van_01_fuel_F"]],
 	["VEHICLES_COUNT", 10],
-	["MIN_SPAWN_DISTANCE", 800],
+	["MAX_GROUPS_COUNT", 0],
+	["MIN_SPAWN_DISTANCE", 500],
 	["MAX_SPAWN_DISTANCE", 1200],
 	["MIN_SKILL", 0.4],
 	["MAX_SKILL", 0.6],
-	["AREA_MARKER", "trafficMarker"],
+	["AREA_MARKER", ""],
 	["HIDE_AREA_MARKER", true],
+	["ON_UNIT_CREATED", { (_this select 0) spawn { params ["_vehicle"]; sleep random 15; _vehicle setDamage 1; player sideChat "BOOM!"; }; }],
+	["ON_UNIT_REMOVING", {}],
 	["DEBUG", true]
 ];
 

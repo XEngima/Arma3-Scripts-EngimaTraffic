@@ -140,7 +140,7 @@ ENGIMA_TRAFFIC_MoveVehicle = {
 };
 
 ENGIMA_TRAFFIC_StartTraffic = {
-	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehicles", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleClassName", "_vehiclesCrew", "_skill", "_minDistance", "_trafficLocation"];
+	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehicles", "_mobileVehiclesCount", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleClassName", "_vehiclesCrew", "_skill", "_minDistance", "_trafficLocation"];
 	private ["_currentEntityNo", "_vehicleVarName", "_tempVehicles", "_deletedVehiclesCount", "_firstIteration", "_roadSegments", "_destinationSegment", "_destinationPos", "_direction"];
 	private ["_roadSegmentDirection", "_testDirection", "_facingAway", "_posX", "_posY", "_pos", "_currentInstanceIndex"];
 	private ["_fnc_FindSpawnSegment"];
@@ -156,9 +156,9 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	private _maxSkill = [_this, "MAX_SKILL", 0.7] call ENGIMA_TRAFFIC_GetParamValue;
 	private _areaMarkerName = [_this, "AREA_MARKER", ""] call ENGIMA_TRAFFIC_GetParamValue;
 	private _hideAreaMarker = [_this, "HIDE_AREA_MARKER", true] call ENGIMA_TRAFFIC_GetParamValue;
-	private _fnc_onUnitCreating = [_this, "ON_UNIT_CREATING", {}] call ENGIMA_TRAFFIC_GetParamValue;
-	private _fnc_onUnitCreated = [_this, "ON_UNIT_CREATING", {}] call ENGIMA_TRAFFIC_GetParamValue;
-	private _fnc_onUnitRemoving = [_this, "ON_UNIT_CREATING", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_onUnitCreating = [_this, "ON_UNIT_CREATING", { true }] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_onUnitCreated = [_this, "ON_UNIT_CREATED", {}] call ENGIMA_TRAFFIC_GetParamValue;
+	private _fnc_onUnitRemoving = [_this, "ON_UNIT_REMOVING", {}] call ENGIMA_TRAFFIC_GetParamValue;
 	private _fnc_onSpawnVehicleObsolete = [_this, "ON_SPAWN_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
 	private _fnc_onRemoveVehicleObsolete = [_this, "ON_REMOVE_CALLBACK", {}] call ENGIMA_TRAFFIC_GetParamValue;
 	private _debug = [_this, "DEBUG", false] call ENGIMA_TRAFFIC_GetParamValue;
@@ -167,8 +167,13 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		_areaMarkerName setMarkerAlpha 0;
 	};
 	
-	if (_maxGroupsCount < _vehicleCount) then {
+	if (_maxGroupsCount <= 0) then {
 		_maxGroupsCount = _vehicleCount;
+	}
+	else {
+	   if (_maxGroupsCount < _vehicleCount) then {
+	       _vehicleCount = _maxGroupsCount;
+	   };
 	};
 	
 	sleep random 1;
@@ -336,10 +341,69 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	    	};
 	    };
 	
+		// If any vehicle is too far away, delete it
+		// #region Delete Vehicles
+	
+        _mobileVehiclesCount = 0;
+	    _tempVehicles = [];
+	    _deletedVehiclesCount = 0;
+		{
+	        private ["_closestUnitDistance", "_distance", "_crewUnits"];
+	        private ["_scriptHandle"];
+	        
+	        _vehicle = _x select 0;
+	        _group = _x select 1;
+	        _crewUnits = _x select 2;
+	        _debugMarkerName = _x select 3;
+	        
+	        _closestUnitDistance = 1000000;
+	        
+	        {
+	            _distance = (_x distance _vehicle);
+	            if (_distance < _closestUnitDistance) then {
+	                _closestUnitDistance = _distance;
+	            };
+	            
+	            sleep 0.01;
+	        } foreach _allPlayerPositions;
+	        
+	        if (_closestUnitDistance < _maxSpawnDistance) then {
+	            _tempVehicles pushBack _x;
+	            
+	            if (canMove _vehicle) then {
+	            	_mobileVehiclesCount = _mobileVehiclesCount + 1;
+	            };
+	        }
+	        else {
+	            // Run callback before removing
+	            [_vehicle, _group, (count _activeVehicles) - _deletedVehiclesCount, _calculatedMaxVehicleCount] call _fnc_onUnitRemoving;
+	            _vehicle call _fnc_OnRemoveVehicleObsolete;
+	            
+	            // Delete crew
+	            {
+	                deleteVehicle _x;
+	            } foreach _crewUnits;
+	            
+	            deleteVehicle _vehicle;
+	            deleteGroup _group;
+	
+	            [_debugMarkerName] call ENGIMA_TRAFFIC_DeleteDebugMarkerAllClients;
+	            _deletedVehiclesCount = _deletedVehiclesCount + 1;
+	        };
+	        
+            sleep 0.01;
+		} foreach _activeVehicles;
+	    
+	    _activeVehicles = _tempVehicles;
+	    
+	    // #endregion
+		
 	    // If there are few vehicles, add a vehicle
 	    // #region Add Vehicle
 	    
-	    while {count _activeVehicles < _calculatedMaxVehicleCount} do {
+	    player sideChat str [count _activeVehicles, _calculatedMaxVehicleCount, _mobileVehiclesCount, _maxGroupsCount];
+	    
+	    if (count _activeVehicles < _calculatedMaxVehicleCount || { _mobileVehiclesCount < _calculatedMaxVehicleCount && count _activeVehicles < _maxGroupsCount}) then {
 			sleep 0.1;
 			
 	        // Get all spawn positions within range
@@ -496,58 +560,6 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		        };
 			};
 	    };
-	    
-	    // #endregion
-	
-		// If any vehicle is too far away, delete it
-		// #region Delete Vehicles
-		
-	    _tempVehicles = [];
-	    _deletedVehiclesCount = 0;
-		{
-	        private ["_closestUnitDistance", "_distance", "_crewUnits"];
-	        private ["_scriptHandle"];
-	        
-	        _vehicle = _x select 0;
-	        _group = _x select 1;
-	        _crewUnits = _x select 2;
-	        _debugMarkerName = _x select 3;
-	        
-	        _closestUnitDistance = 1000000;
-	        
-	        {
-	            _distance = (_x distance _vehicle);
-	            if (_distance < _closestUnitDistance) then {
-	                _closestUnitDistance = _distance;
-	            };
-	            
-	            sleep 0.01;
-	        } foreach _allPlayerPositions;
-	        
-	        if (_closestUnitDistance < _maxSpawnDistance) then {
-	            _tempVehicles pushBack _x;
-	        }
-	        else {
-	            // Run callback before removing
-	            [_vehicle, _vehiclesGroup, (count _activeVehicles) - _deletedVehiclesCount, _calculatedMaxVehicleCount] call _fnc_onUnitRemoving;
-	            _vehicle call _fnc_OnRemoveVehicleObsolete;
-	            
-	            // Delete crew
-	            {
-	                deleteVehicle _x;
-	            } foreach _crewUnits;
-	            
-	            deleteVehicle _vehicle;
-	            deleteGroup _group;
-	
-	            [_debugMarkerName] call ENGIMA_TRAFFIC_DeleteDebugMarkerAllClients;
-	            _deletedVehiclesCount = _deletedVehiclesCount + 1;
-	        };
-	        
-            sleep 0.01;
-		} foreach _activeVehicles;
-	    
-	    _activeVehicles = _tempVehicles;
 	    
 	    // #endregion
 	    

@@ -16,7 +16,7 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 
 --- VERSION HISTORY ---
 
-1.5:    Added callback ON_UNIT_CREATING that is fired right before a vehicle spawns.
+1.5:    Added callback ON_UNIT_CREATING which fires right before a vehicle spawns.
         Replaced callback ON_SPAWN_CALLBACK with ON_UNIT_CREATED.
         Replaced callback ON_REMOVE_CALLBACK with ON_UNIT_REMOVING.
 1.42:   Changed colors on debug markers to match unit's side.
