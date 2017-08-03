@@ -1,8 +1,8 @@
-------------------------------------
- - ENGIMA'S TRAFFIC (VERSION 1.5) -
-------------------------------------
+-------------------------------------
+ - ENGIMA'S TRAFFIC (VERSION 1.52) -
+-------------------------------------
 
-Engima's Traffic is a set of scripts that adds traffic to an Arma 3 mission.
+Engima's Traffic is a scripts that adds traffic to an Arma 3 mission.
 
 Vehicles of different types are spawned in out of sight for the player(s). They get a waypoint to a random road segment 
 on the map, but are removed at a certain distance from the nearest player.
@@ -16,22 +16,24 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 
 --- VERSION HISTORY ---
 
-1.5:    Added callback ON_UNIT_CREATING which fires right before a vehicle spawns.
-        Replaced callback ON_SPAWN_CALLBACK with ON_UNIT_CREATED.
-        Replaced callback ON_REMOVE_CALLBACK with ON_UNIT_REMOVING.
-        Fixed: Vehicles tend to spawn more often behind the players than ahead of them.
-1.42:   Changed colors on debug markers to match unit's side.
-1.4:    Added support for headless clients.
-1.3.1:  Script no longer tries to terminate scripts that were started in spawn callback.
-1.3:    Possibility to select areas (markers) where the traffic will be.
-        Better performance on large maps (like Altis).
-1.21:   New file structure that will better allow for future updates.
-        Removed dependency to Engima.CommonLib.
-1.2:    Fixed: Vehicles that reached their destination were not assigned a new destination.
-1.1:    Optimizations.
-        Fixed: Script error when a player die in MP.
-        Rework of file structure.
-1.0:    First version.
+1.52:  Fixed: Many traffic units not moving on maps with many small island (like Tanoa).
+1.5:   Added callback ON_UNIT_CREATING which fires right before a vehicle spawns.
+       Replaced callback ON_SPAWN_CALLBACK with ON_UNIT_CREATED.
+       Replaced callback ON_REMOVE_CALLBACK with ON_UNIT_REMOVING.
+       Added configuration parameter MAX_GROUPS_COUNT.
+       Fixed: Vehicles tend to spawn more often behind the players than ahead of them.
+1.42:  Changed colors on debug markers to match unit's side.
+1.4:   Added support for headless clients.
+1.3.1: Script no longer tries to terminate scripts that were started in spawn callback.
+1.3:   Possibility to select areas (markers) where the traffic will be.
+       Better performance on large maps (like Altis).
+1.21:  New file structure that will better allow for future updates.
+       Removed dependency to Engima.CommonLib.
+1.2:   Fixed: Vehicles that reached their destination were not assigned a new destination.
+1.1:   Optimizations.
+       Fixed: Script error when a player die in MP.
+       Rework of file structure.
+1.0:   First version.
 
 
 --- CUSTOMIZATION ---
@@ -83,17 +85,17 @@ Here is a complete list of the parameters and what they do:
 * VEHICLES_COUNT (Scalar): Number of moving vehicles that exists on the map for the current traffic instance. If
   a vehicle is damage to a degree that it cannot move (!canMove vehicle), then it will not be counted, and a new 
   vehicle will be created. But only if allowed by MAX_GROUPS_COUNT (se below).
-  Example: If VEHICLES_COUNT is set to 10, MAX_GROUPS_COUNT set to 15, and MAX_SPAWN_DISTANCE is set to 1000, then 
-  there will be 10 vehicles on an area of 3142 square meters (1000 * pi). If one of them gets damaged so it cannot 
-  move, then an 11th will spawn (and so on up to 15).
+  Example: If in single player and VEHICLES_COUNT is set to 10, MAX_GROUPS_COUNT set to 15, and MAX_SPAWN_DISTANCE is 
+  set to 1000, then there will be 10 vehicles on an area of 3142 square meters (1000 * pi). If one of them gets damaged 
+  so it cannot move, then an 11th will spawn (and so on up to 15).
 
 * MAX_GROUPS_COUNT (Scalar): Maximum number of groups that the script will ever have created at the same time. If set
   to 0 (default) then the VEHICLES_COUNT value will be used. If set to a value greater than 0 and less than 
   VEHICLES_COUNT will limit the number of vehicles to MAX_GROUPS_COUNT. If set to a value greater than VEHICLES_COUNT,
   then the script is given the possibility to spawn in new vehicles when one is damaged to a degree when it cannot move.
   (See also VEHICLES_COUNT above.)
-  Example: If VEHICLES_COUNT is set to 10 and MAX_GROUPS_COUNT is set to 15, and all ten vehicles are destroyed. Then
-  the script will spawn in 5 new vehicles. Damaged vehicles will be removed when players get far away as usual.
+  Example: If VEHICLES_COUNT is set to 10 and MAX_GROUPS_COUNT is set to 15, and all ten vehicles are destroyed, then
+  the script will spawn in 5 new vehicles. Damaged vehicles will be removed when players move away far enough as usual.
 
 * MIN_SPAWN_DISTANCE (Scalar): Minimum spawn distance in meters from nearest human player on the map. Should be at least 100 
   meters less than MAX_SPAWN_DISTANCE.
@@ -185,4 +187,4 @@ To route the execution to a headless client, follow these steps:
    Example: Engima_Traffic_HeadlessClientName = "HC1";
 3. Have your server support headless clients.
 
-For more information (for step 3 particulary), see the official and general documentation about headless clients.
+For more information (for step 3 in particular), see the official and general documentation about headless clients.

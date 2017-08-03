@@ -115,12 +115,22 @@ ENGIMA_TRAFFIC_MoveVehicle = {
     _vehicle setFuel _fuel;
     
     if (count _firstDestinationPos > 0) then {
-        _destinationPos = + _firstDestinationPos;
+        _destinationPos = +_firstDestinationPos;
     }
     else {
 		_roadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex;
+		
         _destinationSegment = selectRandom _roadSegments;
         _destinationPos = getPos _destinationSegment;
+        private _currentPos = getPos _vehicle;
+        private _tries = 0;
+        
+		while { _destinationPos distance2D _currentPos > 1000 && _tries < 50 } do {
+	        _destinationSegment = selectRandom _roadSegments;
+	        _destinationPos = getPos _destinationSegment;
+	        _tries = _tries + 1;
+	        sleep 0.02;
+		};
     };
     
     if (isNil "ENG_destinationMarkerNo") then {
@@ -475,8 +485,18 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	                default { _roadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex };
 	            };
 	            
-	            _destinationSegment = _roadSegments select floor random count _roadSegments;
+	            _destinationSegment = selectRandom _roadSegments;
 	            _destinationPos = getPos _destinationSegment;
+
+		        private _currentPos = getPos _vehicle;
+		        private _tries = 0;
+		        
+				while { _destinationPos distance2D _currentPos > 1500 && _tries < 20 } do {
+			        _destinationSegment = selectRandom _roadSegments;
+			        _destinationPos = getPos _destinationSegment;
+			        _tries = _tries + 1;
+			        sleep 0.02;
+				};
 
 	            _direction = ((_destinationPos select 0) - (getPos _spawnSegment select 0)) atan2 ((_destinationPos select 1) - (getpos _spawnSegment select 1));
 	            _roadSegmentDirection = getDir _spawnSegment;
