@@ -301,7 +301,8 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		if (isMultiplayer) then {
 			{
 				if (isPlayer _x) then {
-					_allPlayerPositionsTemp = _allPlayerPositionsTemp + [position vehicle _x];
+					private _pos = position vehicle _x;
+					_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _pos getPos [(speed vehicle _x) * 3.6]]];
 				};
 			} foreach (playableUnits);
 		}
