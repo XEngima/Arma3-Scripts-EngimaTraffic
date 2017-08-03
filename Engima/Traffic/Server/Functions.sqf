@@ -287,6 +287,16 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	
 	// #endregion
 	
+	private _closeCircleMarker = createMarkerLocal ["ENG_CloseMarker", getPos vehicle player];
+	_closeCircleMarker setMarkerShapeLocal "ELLIPSE";
+	_closeCircleMarker setMarkerColorLocal "ColorRed";
+	_closeCircleMarker setMarkerBrushLocal "Border";
+	
+	private _farCircleMarker = createMarkerLocal ["ENG_FarMarker", getPos vehicle player];
+	_farCircleMarker setMarkerShapeLocal "ELLIPSE";
+	_farCircleMarker setMarkerColorLocal "ColorBlue";
+	_farCircleMarker setMarkerColorLocal "Border";
+	
 	_firstIteration = true;
 	
 	[] spawn ENGIMA_TRAFFIC_FindEdgeRoads;
@@ -307,13 +317,18 @@ ENGIMA_TRAFFIC_StartTraffic = {
 			} foreach (playableUnits);
 		}
 		else {
-			_allPlayerPositionsTemp = [position vehicle player];
+			private _pos = position vehicle player;
+			private _aheadPos = _pos getPos [(speed vehicle player) * 3.6];
+			_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _aheadPos]];
+			
+			_closeCircleMarker setMarkerPosLocal _pos;
+			_farCircleMarker setMarkerPosLocal _aheadPos;
 		};
 	
 		if (count _allPlayerPositionsTemp > 0) then {
 			_allPlayerPositions = _allPlayerPositionsTemp;
 		};
-	
+		
 	    if (_areaMarkerName == "") then {
 		    _calculatedMaxVehicleCount = _vehicleCount;
 	    }
