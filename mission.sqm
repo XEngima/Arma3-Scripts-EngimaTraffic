@@ -8,42 +8,66 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=9;
+		nextID=28;
 	};
 	class MarkerIDProvider
 	{
-		nextID=1;
+		nextID=2;
 	};
 	class Camera
 	{
-		pos[]={7240.0283,145.72298,8569.4248};
-		dir[]={0.42407835,-0.25784042,0.86815655};
-		up[]={0.11318967,0.96617329,0.23171768};
-		aside[]={0.89853644,-1.1728844e-007,-0.4389194};
+		pos[]={5989.4141,183.64568,10014.262};
+		dir[]={0.40387824,-0.22417977,0.8869276};
+		up[]={0.09294565,0.9745245,0.20411286};
+		aside[]={0.91009039,7.1385875e-007,-0.41442513};
 	};
 };
 binarizationWanted=0;
 addons[]=
 {
+	"A3_Air_F_Exp_Plane_Civil_01",
 	"A3_Characters_F",
-	"A3_Air_F_Exp_Plane_Civil_01"
+	"A3_Air_F_Heli_Light_01",
+	"A3_Ui_F",
+	"A3_Soft_F_Quadbike_01"
 };
 class AddonsMetaData
 {
 	class List
 	{
-		items=2;
+		items=5;
 		class Item0
+		{
+			className="A3_Air_F_Exp";
+			name="Arma 3 Apex - Aircrafts";
+			author="Bohemia Interactive";
+			url="https://www.arma3.com";
+		};
+		class Item1
 		{
 			className="A3_Characters_F";
 			name="Arma 3 Alpha - Characters and Clothing";
 			author="Bohemia Interactive";
 			url="https://www.arma3.com";
 		};
-		class Item1
+		class Item2
 		{
-			className="A3_Air_F_Exp";
-			name="Arma 3 Apex - Aircrafts";
+			className="A3_Air_F";
+			name="Arma 3 Alpha - Aircrafts";
+			author="Bohemia Interactive";
+			url="https://www.arma3.com";
+		};
+		class Item3
+		{
+			className="A3_Ui_F";
+			name="Arma 3 - User Interface";
+			author="Bohemia Interactive";
+			url="https://www.arma3.com";
+		};
+		class Item4
+		{
+			className="A3_Soft_F";
+			name="Arma 3 Alpha - Unarmored Land Vehicles";
 			author="Bohemia Interactive";
 			url="https://www.arma3.com";
 		};
@@ -76,8 +100,39 @@ class Mission
 	};
 	class Entities
 	{
-		items=3;
+		items=9;
 		class Item0
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={7922.0776,32.597443,9501.2217};
+				angles[]={-0,0.0033601085,0};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+			};
+			id=6;
+			type="C_Plane_Civil_01_F";
+			atlOffset=-0.04977417;
+		};
+		class Item1
+		{
+			dataType="Logic";
+			class PositionInfo
+			{
+				position[]={7291.9668,104.84348,8617.5361};
+				angles[]={0.083803542,0,0.032789111};
+			};
+			name="HC1";
+			isPlayable=1;
+			id=7;
+			type="HeadlessClient_F";
+			atlOffset=7.6293945e-006;
+		};
+		class Item2
 		{
 			dataType="Group";
 			side="West";
@@ -89,16 +144,16 @@ class Mission
 					dataType="Object";
 					class PositionInfo
 					{
-						position[]={7247.5127,116.53966,8604.3447};
+						position[]={5985.394,174.04567,10057.901};
 					};
 					side="West";
 					flags=7;
 					class Attributes
 					{
-						isPlayer=1;
+						isPlayable=1;
 					};
-					id=1;
-					type="B_Soldier_F";
+					id=10;
+					type="B_soldier_AT_F";
 					class CustomAttributes
 					{
 						class Attribute0
@@ -116,7 +171,7 @@ class Mission
 											"STRING"
 										};
 									};
-									value="Male07ENG";
+									value="Male06ENG";
 								};
 							};
 						};
@@ -135,7 +190,7 @@ class Mission
 											"SCALAR"
 										};
 									};
-									value=0.98000002;
+									value=0.95999998;
 								};
 							};
 						};
@@ -146,37 +201,157 @@ class Mission
 			class Attributes
 			{
 			};
-			id=0;
+			id=9;
 		};
-		class Item1
+		class Item3
 		{
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={7238.1675,118.75258,8608.1055};
-				angles[]={0.1973955,0.0033601085,6.1393847};
+				position[]={6475.4482,253.3895,8053.8394};
+				angles[]={6.1292138,0,6.236021};
 			};
 			side="Empty";
 			flags=4;
 			class Attributes
 			{
 			};
-			id=6;
-			type="C_Plane_Civil_01_F";
-			atlOffset=-0.045227051;
+			id=11;
+			type="B_Heli_Light_01_dynamicLoadout_F";
+			atlOffset=-0.17759705;
 		};
-		class Item2
+		class Item4
 		{
-			dataType="Logic";
+			dataType="Object";
 			class PositionInfo
 			{
-				position[]={7291.9668,104.84348,8617.5361};
-				angles[]={0.083803542,0,0.032789111};
+				position[]={5803.7065,217.02817,10204.524};
+				angles[]={0.013597663,0,6.2631893};
 			};
-			name="HC1";
-			isPlayable=1;
-			id=7;
-			type="HeadlessClient_F";
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+			};
+			id=12;
+			type="B_Heli_Light_01_dynamicLoadout_F";
+			atlOffset=-0.085830688;
+		};
+		class Item5
+		{
+			dataType="Marker";
+			position[]={1282.7686,-278.79297,12047.153};
+			name="trafficMarker";
+			markerType="ELLIPSE";
+			type="ellipse";
+			a=1500;
+			b=1000;
+			id=13;
+			atlOffset=-279.19711;
+		};
+		class Item6
+		{
+			dataType="Group";
+			side="West";
+			class Entities
+			{
+				items=1;
+				class Item0
+				{
+					dataType="Object";
+					class PositionInfo
+					{
+						position[]={6009.1758,173.09836,10042.822};
+					};
+					side="West";
+					flags=7;
+					class Attributes
+					{
+						isPlayer=1;
+					};
+					id=15;
+					type="B_engineer_F";
+					class CustomAttributes
+					{
+						class Attribute0
+						{
+							property="speaker";
+							expression="_this setspeaker _value;";
+							class Value
+							{
+								class data
+								{
+									class type
+									{
+										type[]=
+										{
+											"STRING"
+										};
+									};
+									value="Male05ENG";
+								};
+							};
+						};
+						class Attribute1
+						{
+							property="pitch";
+							expression="_this setpitch _value;";
+							class Value
+							{
+								class data
+								{
+									class type
+									{
+										type[]=
+										{
+											"SCALAR"
+										};
+									};
+									value=1.04;
+								};
+							};
+						};
+						nAttributes=2;
+					};
+				};
+			};
+			class Attributes
+			{
+			};
+			id=14;
+		};
+		class Item7
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={6007.2681,175.04134,10045.822};
+				angles[]={6.186686,0,6.2751918};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+			};
+			id=21;
+			type="B_Quadbike_01_F";
+			atlOffset=-1.5258789e-005;
+		};
+		class Item8
+		{
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={5998.4419,175.12187,10029.268};
+				angles[]={6.2583928,0,0.0087958695};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+			};
+			id=27;
+			type="B_Heli_Light_01_dynamicLoadout_F";
 		};
 	};
 };

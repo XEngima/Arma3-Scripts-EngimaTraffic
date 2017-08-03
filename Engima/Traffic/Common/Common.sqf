@@ -10,7 +10,7 @@ ENGIMA_TRAFFIC_GetParamValue = {
   	private ["_params", "_key"];
   	private ["_value"];
 
-   	_params = _this select 0;
+	_params = _this select 0;
    	_key = _this select 1;
 	_value = if (count _this > 2) then { _this select 2 } else { objNull };
 

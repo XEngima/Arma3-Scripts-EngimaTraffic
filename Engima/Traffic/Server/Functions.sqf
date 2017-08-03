@@ -104,15 +104,11 @@ ENGIMA_TRAFFIC_FindEdgeRoads = {
 };
 
 ENGIMA_TRAFFIC_MoveVehicle = {
-	private ["_currentInstanceIndex", "_vehicle", "_firstDestinationPos", "_debug"];
+	params ["_currentInstanceIndex", "_vehicle", ["_firstDestinationPos", []], ["_debug", false]];
+
     private ["_speed", "_roadSegments", "_destinationSegment"];
     private ["_destinationPos"];
     private ["_waypoint", "_fuel"];
-    
-	_currentInstanceIndex = _this select 0;
-    _vehicle = _this select 1;
-    if (count _this > 2) then {_firstDestinationPos = _this select 2;} else {_firstDestinationPos = [];};
-    if (count _this > 3) then {_debug = _this select 3;} else {_debug = false;};
     
     // Set fuel to something in between 0.3 and 0.9.
     _fuel = 0.3 + random (0.9 - 0.3);
@@ -123,8 +119,12 @@ ENGIMA_TRAFFIC_MoveVehicle = {
     }
     else {
 		_roadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex;
-        _destinationSegment = _roadSegments select floor random count _roadSegments;
+        _destinationSegment = selectRandom _roadSegments;
         _destinationPos = getPos _destinationSegment;
+    };
+    
+    if (isNil "ENG_destinationMarkerNo") then {
+    	ENG_destinationMarkerNo = 1;
     };
     
     _speed = "NORMAL";
@@ -132,18 +132,113 @@ ENGIMA_TRAFFIC_MoveVehicle = {
         _speed = "LIMITED";
     };
     
-    _waypoint = group _vehicle addWaypoint [_destinationPos, 10];
+    private _group = group _vehicle;
+    
+    _waypoint = _group addWaypoint [_destinationPos, 10];
     _waypoint setWaypointBehaviour "SAFE";
     _waypoint setWaypointSpeed _speed;
     _waypoint setWaypointCompletionRadius 10;
     _waypoint setWaypointStatements ["true", "_nil = [" + str _currentInstanceIndex + ", " + vehicleVarName _vehicle + ", [], " + str _debug + "] spawn ENGIMA_TRAFFIC_MoveVehicle;"];
+    _group setBehaviour "SAFE";
+};
+
+ENGIMA_TRAFFIC_FindSpawnSegment = {
+    params ["_currentInstanceIndex", "_allPlayerPositions", "_minSpawnDistance", "_maxSpawnDistance", "_activeVehicles"];
+    private ["_insideMarker", "_areaMarkerName", "_refPlayerPos", "_roadSegments", "_roadSegment", "_isOk", "_tries", "_result", "_spawnDistanceDiff", "_refPosX", "_refPosY", "_dir", "_tooFarAwayFromAll", "_tooClose", "_tooCloseToAnotherVehicle"];
+	
+    _spawnDistanceDiff = _maxSpawnDistance - _minSpawnDistance;
+    _roadSegment = "NULL";
+    _refPlayerPos = (selectRandom _allPlayerPositions) select 1;
+    _areaMarkerName = ENGIMA_TRAFFIC_areaMarkerNames select _currentInstanceIndex;
+    
+    _isOk = false;
+    _tries = 0;
+    while {!_isOk && _tries < 10} do {
+        _isOk = true;
+        
+        _dir = random 360;
+
+        _refPosX = (_refPlayerPos select 0) + (_minSpawnDistance + _spawnDistanceDiff / 2) * sin _dir;
+        _refPosY = (_refPlayerPos select 1) + (_minSpawnDistance + _spawnDistanceDiff / 2) * cos _dir;
+        
+        _roadSegments = [_refPosX, _refPosY] nearRoads (_spawnDistanceDiff / 2);
+        
+        if (count _roadSegments > 0) then {
+            _roadSegment = _roadSegments select floor random count _roadSegments;
+            
+            // Check if road segment is ok
+            _tooFarAwayFromAll = true;
+            _tooClose = false;
+            _insideMarker = true;
+            _tooCloseToAnotherVehicle = false;
+            
+            if (_areaMarkerName != "" && !((getPos _roadSegment) inArea _areaMarkerName)) then {
+            	_insideMarker = false;
+            };
+            
+            if (_insideMarker) then {
+	            {
+	            	private _closePos = _x select 0;
+	            	private _farPos = _x select 1;
+	                private _tooFarAway = false;
+	                
+	                if (_closePos distance (getPos _roadSegment) < _minSpawnDistance) then {
+	                    _tooClose = true;
+	                }
+	                else {
+		                if (_farPos distance (getPos _roadSegment) > _maxSpawnDistance) then {
+		                    _tooFarAway = true;
+		                };
+	                };
+	                
+	                if (!_tooFarAway) then {
+	                    _tooFarAwayFromAll = false;
+	                };
+	                
+	                sleep 0.01;
+	            } foreach _allPlayerPositions;
+			
+                {
+                    private ["_vehicle"];
+                    _vehicle = _x select 0;
+                    
+                    if ((getPos _roadSegment) distance _vehicle < 100) then {
+                        _tooCloseToAnotherVehicle = true;
+                    };
+                    
+                    sleep 0.01;
+                } foreach _activeVehicles;
+			};
+	                
+            _isOk = true;
+            
+            if (_tooClose || _tooFarAwayFromAll || _tooCloseToAnotherVehicle || !_insideMarker) then {
+                _isOk = false;
+                _tries = _tries + 1;
+            };
+        }
+        else {
+            _isOk = false;
+            _tries = _tries + 1;
+        };
+        
+		sleep 0.1;
+    };
+
+    if (!_isOk) then {
+        _result = "NULL";
+    }
+    else {
+        _result = _roadSegment;
+    };
+
+    _result
 };
 
 ENGIMA_TRAFFIC_StartTraffic = {
 	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehicles", "_mobileVehiclesCount", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleClassName", "_vehiclesCrew", "_skill", "_minDistance", "_trafficLocation"];
 	private ["_currentEntityNo", "_vehicleVarName", "_tempVehicles", "_deletedVehiclesCount", "_firstIteration", "_roadSegments", "_destinationSegment", "_destinationPos", "_direction"];
 	private ["_roadSegmentDirection", "_testDirection", "_facingAway", "_posX", "_posY", "_pos", "_currentInstanceIndex"];
-	private ["_fnc_FindSpawnSegment"];
 	private ["_debugMarkerName"];
 
 	private _side = [_this, "SIDE", civilian] call ENGIMA_TRAFFIC_GetParamValue;
@@ -187,115 +282,19 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	
 	_activeVehicles = [];
 	
-	// #Region Function FindSpawnSegment
-	
-	_fnc_FindSpawnSegment = {
-	    private ["_currentInstanceIndex", "_allPlayerPositions", "_minSpawnDistance", "_maxSpawnDistance", "_activeVehicles"];
-	    private ["_insideMarker", "_areaMarkerName", "_refPlayerPos", "_roadSegments", "_roadSegment", "_isOk", "_tries", "_result", "_spawnDistanceDiff", "_refPosX", "_refPosY", "_dir", "_tooFarAwayFromAll", "_tooClose", "_tooCloseToAnotherVehicle"];
-		
-		_currentInstanceIndex = _this select 0;
-	    _allPlayerPositions = _this select 1;
-	    _minSpawnDistance = _this select 2;
-	    _maxSpawnDistance = _this select 3;
-	    _activeVehicles = _this select 4;
-	    
-	    _spawnDistanceDiff = _maxSpawnDistance - _minSpawnDistance;
-	    _roadSegment = "NULL";
-	    _refPlayerPos = (_allPlayerPositions select floor random count _allPlayerPositions);
-	    _areaMarkerName = ENGIMA_TRAFFIC_areaMarkerNames select _currentInstanceIndex;
-	    
-	    _isOk = false;
-	    _tries = 0;
-	    while {!_isOk && _tries < 10} do {
-	        _isOk = true;
-	        
-	        _dir = random 360;
-	
-	        _refPosX = (_refPlayerPos select 0) + (_minSpawnDistance + _spawnDistanceDiff / 2) * sin _dir;
-	        _refPosY = (_refPlayerPos select 1) + (_minSpawnDistance + _spawnDistanceDiff / 2) * cos _dir;
-	        
-	        _roadSegments = [_refPosX, _refPosY] nearRoads (_spawnDistanceDiff / 2);
-	        
-	        if (count _roadSegments > 0) then {
-	            _roadSegment = _roadSegments select floor random count _roadSegments;
-	            
-	            // Check if road segment is ok
-	            _tooFarAwayFromAll = true;
-	            _tooClose = false;
-                _insideMarker = true;
-                _tooCloseToAnotherVehicle = false;
-                
-                if (_areaMarkerName != "" && !((getPos _roadSegment) inArea _areaMarkerName)) then {
-                	_insideMarker = false;
-                };
-                
-                if (_insideMarker) then {
-		            {
-		                private ["_tooFarAway"];
-		                
-		                _tooFarAway = false;
-		                
-		                if (_x distance (getPos _roadSegment) < _minSpawnDistance) then {
-		                    _tooClose = true;
-		                };
-		                if (_x distance (getPos _roadSegment) > _maxSpawnDistance) then {
-		                    _tooFarAway = true;
-		                };
-		                if (!_tooFarAway) then {
-		                    _tooFarAwayFromAll = false;
-		                };
-		                
-		                sleep 0.01;
-		            } foreach _allPlayerPositions;
-				
-	                {
-	                    private ["_vehicle"];
-	                    _vehicle = _x select 0;
-	                    
-	                    if ((getPos _roadSegment) distance _vehicle < 100) then {
-	                        _tooCloseToAnotherVehicle = true;
-	                    };
-	                    
-	                    sleep 0.01;
-	                } foreach _activeVehicles;
-				};
-		                
-	            _isOk = true;
-	            
-	            if (_tooClose || _tooFarAwayFromAll || _tooCloseToAnotherVehicle || !_insideMarker) then {
-	                _isOk = false;
-	                _tries = _tries + 1;
-	            };
-	        }
-	        else {
-	            _isOk = false;
-	            _tries = _tries + 1;
-	        };
-	        
-			sleep 0.1;
-	    };
-	
-	    if (!_isOk) then {
-	        _result = "NULL";
-	    }
-	    else {
-	        _result = _roadSegment;
-	    };
-	
-	    _result
-	};
-	
-	// #endregion
-	
+	/*
 	private _closeCircleMarker = createMarkerLocal ["ENG_CloseMarker", getPos vehicle player];
 	_closeCircleMarker setMarkerShapeLocal "ELLIPSE";
+	_closeCircleMarker setMarkerSizeLocal [_minSpawnDistance, _minSpawnDistance];
 	_closeCircleMarker setMarkerColorLocal "ColorRed";
 	_closeCircleMarker setMarkerBrushLocal "Border";
 	
 	private _farCircleMarker = createMarkerLocal ["ENG_FarMarker", getPos vehicle player];
 	_farCircleMarker setMarkerShapeLocal "ELLIPSE";
+	_farCircleMarker setMarkerSizeLocal [_maxSpawnDistance, _maxSpawnDistance];
 	_farCircleMarker setMarkerColorLocal "ColorBlue";
-	_farCircleMarker setMarkerColorLocal "Border";
+	_farCircleMarker setMarkerBrushLocal "Border";
+	*/
 	
 	_firstIteration = true;
 	
@@ -312,17 +311,28 @@ ENGIMA_TRAFFIC_StartTraffic = {
 			{
 				if (isPlayer _x) then {
 					private _pos = position vehicle _x;
-					_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _pos getPos [(speed vehicle _x) * 3.6]]];
+					private _aheadPos = _pos getPos [(speed vehicle _x) * 3.6, getDir _x];
+					_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _aheadPos]];
+					
+					/*
+					if (_x == player) then {
+						_closeCircleMarker setMarkerPosLocal _pos;
+						_farCircleMarker setMarkerPosLocal _aheadPos;
+					};
+					*/
 				};
 			} foreach (playableUnits);
 		}
 		else {
 			private _pos = position vehicle player;
-			private _aheadPos = _pos getPos [(speed vehicle player) * 3.6];
+			private _aheadPos = _pos getPos [(speed vehicle player) * 3.6, getDir player];
+			
 			_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _aheadPos]];
 			
+			/*
 			_closeCircleMarker setMarkerPosLocal _pos;
 			_farCircleMarker setMarkerPosLocal _aheadPos;
+			*/
 		};
 	
 		if (count _allPlayerPositionsTemp > 0) then {
@@ -341,7 +351,10 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		    	_coveredShare = 0;
 		    	
 			    {
-			    	_restDistance = _maxSpawnDistance - ((_x distance getMarkerPos _areaMarkerName) - _avgMarkerRadius);
+					//private _closePos = _x select 0;
+					private _farPos = _x select 1;
+				
+			    	_restDistance = _maxSpawnDistance - ((_farPos distance getMarkerPos _areaMarkerName) - _avgMarkerRadius);
 			    	_coveredAreaShare = _restDistance / (_maxSpawnDistance * 2);
 				    if (_coveredAreaShare > _coveredShare) then {
 					    _coveredShare = _coveredAreaShare;
@@ -373,17 +386,30 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	        _debugMarkerName = _x select 3;
 	        
 	        _closestUnitDistance = 1000000;
+	        private _keepVehicle = false;
 	        
 	        {
-	            _distance = (_x distance _vehicle);
+	        	scopeName "current";
+	        	
+				private _closePos = _x select 0;
+				private _farPos = _x select 1;
+			
+	            _distance = (_farPos distance _vehicle);
 	            if (_distance < _closestUnitDistance) then {
 	                _closestUnitDistance = _distance;
+	                
+	                if (_closestUnitDistance < _maxSpawnDistance || (_closePos distance2D _vehicle) < _closePos distance2D _farPos) then {
+	                	_keepVehicle = true;
+	                	breakOut "current";
+	                };
 	            };
 	            
 	            sleep 0.01;
 	        } foreach _allPlayerPositions;
 	        
-	        if (_closestUnitDistance < _maxSpawnDistance) then {
+	        if (_keepVehicle) then {
+	        	// Keep vehicle
+	        	
 	            _tempVehicles pushBack _x;
 	            
 	            if (canMove _vehicle) then {
@@ -391,6 +417,8 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	            };
 	        }
 	        else {
+	        	// Remove vehicle
+	        
 	            // Run callback before removing
 	            [_vehicle, _group, (count _activeVehicles) - _deletedVehiclesCount, _calculatedMaxVehicleCount] call _fnc_onUnitRemoving;
 	            _vehicle call _fnc_OnRemoveVehicleObsolete;
@@ -417,8 +445,6 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	    // If there are few vehicles, add a vehicle
 	    // #region Add Vehicle
 	    
-	    player sideChat str [count _activeVehicles, _calculatedMaxVehicleCount, _mobileVehiclesCount, _maxGroupsCount];
-	    
 	    if (count _activeVehicles < _calculatedMaxVehicleCount || { _mobileVehiclesCount < _calculatedMaxVehicleCount && count _activeVehicles < _maxGroupsCount}) then {
 			sleep 0.1;
 			
@@ -434,7 +460,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	            _minDistance = _minSpawnDistance;
 	        };
 	        
-	        _spawnSegment = [_currentInstanceIndex, _allPlayerPositions, _minDistance, _maxSpawnDistance, _activeVehicles] call _fnc_FindSpawnSegment;
+	        _spawnSegment = [_currentInstanceIndex, _allPlayerPositions, _minDistance, _maxSpawnDistance, _activeVehicles] call ENGIMA_TRAFFIC_FindSpawnSegment;
 	        
 	        // If there were spawn positions
 	        if (str _spawnSegment != """NULL""") then {
@@ -507,6 +533,10 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	            _pos = _spawnArgs select 0;
 	            _vehicleClassName = _spawnArgs select 1;
 	            
+                if (isNil "_goOnWithSpawn") then {
+                    _goOnWithSpawn = true;
+                };
+                
                 // If the user has not messed something up, use the edited class list
                 private _userMessedUp = false;
                 private _logMsg = "";
@@ -523,12 +553,6 @@ ENGIMA_TRAFFIC_StartTraffic = {
                     _vehicleClassName = "";
                     _userMessedUp = true;
                     _logMsg = "Engima.Traffic: Error - Altered parameter 1 in ON_UNIT_CREATING is not an array. Must be an array with unit class names.";
-                };
-                
-                if (isNil "_goOnWithSpawn") then {
-                    _goOnWithSpawn = false;
-                    _userMessedUp = true;
-                    _logMsg = "Engima.Traffic: Error - Return value of callback ON_UNIT_CREATING is nil. Must be true or false.";
                 };
                 
                 if (_userMessedUp) then {

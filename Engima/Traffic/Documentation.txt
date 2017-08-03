@@ -19,6 +19,7 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 1.5:    Added callback ON_UNIT_CREATING which fires right before a vehicle spawns.
         Replaced callback ON_SPAWN_CALLBACK with ON_UNIT_CREATED.
         Replaced callback ON_REMOVE_CALLBACK with ON_UNIT_REMOVING.
+        Fixed: Vehicles tend to spawn more often behind the players than ahead of them.
 1.42:   Changed colors on debug markers to match unit's side.
 1.4:    Added support for headless clients.
 1.3.1:  Script no longer tries to terminate scripts that were started in spawn callback.
@@ -84,14 +85,15 @@ Here is a complete list of the parameters and what they do:
   vehicle will be created. But only if allowed by MAX_GROUPS_COUNT (se below).
   Example: If VEHICLES_COUNT is set to 10, MAX_GROUPS_COUNT set to 15, and MAX_SPAWN_DISTANCE is set to 1000, then 
   there will be 10 vehicles on an area of 3142 square meters (1000 * pi). If one of them gets damaged so it cannot 
-  move, then an 11th will be spawned (up to 15).
+  move, then an 11th will spawn (and so on up to 15).
 
 * MAX_GROUPS_COUNT (Scalar): Maximum number of groups that the script will ever have created at the same time. If set
-  to 0 (default) then the VEHICLES_COUNT value will be used. Must be set to 0 or a value greater than or equal to 
-  VEHICLES_COUNT. If set to a value greater than VEHICLES_COUNT, then the script is given the possibility to spawn in 
-  new vehicles when one is damaged to a degree when it cannot move. (See also VEHICLES_COUNT above.)
-  Example: If VEHICLES_COUNT is set to 10 and MAX_GROUPS_COUNT is set to 15, and all ten vehicles is destroyed. Then
-  the script will spawn in 5 new vehicles.
+  to 0 (default) then the VEHICLES_COUNT value will be used. If set to a value greater than 0 and less than 
+  VEHICLES_COUNT will limit the number of vehicles to MAX_GROUPS_COUNT. If set to a value greater than VEHICLES_COUNT,
+  then the script is given the possibility to spawn in new vehicles when one is damaged to a degree when it cannot move.
+  (See also VEHICLES_COUNT above.)
+  Example: If VEHICLES_COUNT is set to 10 and MAX_GROUPS_COUNT is set to 15, and all ten vehicles are destroyed. Then
+  the script will spawn in 5 new vehicles. Damaged vehicles will be removed when players get far away as usual.
 
 * MIN_SPAWN_DISTANCE (Scalar): Minimum spawn distance in meters from nearest human player on the map. Should be at least 100 
   meters less than MAX_SPAWN_DISTANCE.
@@ -127,8 +129,8 @@ Here is a complete list of the parameters and what they do:
       0 (Array): The position where the vehicle is suggested to spawn (can be modified).
       1 (String): The classname for the vehicle to spawn (can be modified).
     1 (Scalar): Number of vehicles spawned and currently controlled by the script.
-    2 (Scalar): Calculated maximun number of civilians that the script will try to spawn (depends on spwn markers
-    etc.).
+    2 (Scalar): Calculated maximun number of vehicles that the script will try to spawn (depends on spawn markers etc.). It
+    is always a value between 0 and VEHICLES_COUNT (including).
   The example below will not spawn traffic during the night:
   Example: { private _goOnWithSpawn = (dayTime > 8 && dayTime < 22); _goOnWithSpawn )
 
