@@ -16,7 +16,7 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 
 --- VERSION HISTORY ---
 
-1.52:  Fixed: Many traffic units not moving on maps with many small island (like Tanoa).
+1.52:  Fixed: Many traffic units not moving on maps with many small islands (like Tanoa).
 1.5:   Added callback ON_UNIT_CREATING which fires right before a vehicle spawns.
        Replaced callback ON_SPAWN_CALLBACK with ON_UNIT_CREATED.
        Replaced callback ON_REMOVE_CALLBACK with ON_UNIT_REMOVING.

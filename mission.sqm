@@ -8,28 +8,29 @@ class EditorData
 	toggles=1;
 	class ItemIDProvider
 	{
-		nextID=28;
+		nextID=21;
 	};
 	class MarkerIDProvider
 	{
-		nextID=2;
+		nextID=4;
 	};
 	class Camera
 	{
-		pos[]={5982.4355,189.51712,9994.7217};
-		dir[]={0.44652164,-0.37866098,0.81071264};
-		up[]={0.18272634,0.92549461,0.33176205};
-		aside[]={0.87593704,6.2244362e-007,-0.48244452};
+		pos[]={9963.2773,121.6921,9480.7285};
+		dir[]={0.021675814,-0.38546422,0.92252564};
+		up[]={0.0090562105,0.92268836,0.38544413};
+		aside[]={0.99977422,3.0882256e-007,-0.023493391};
 	};
 };
 binarizationWanted=0;
 addons[]=
 {
-	"A3_Air_F_Exp_Plane_Civil_01",
 	"A3_Characters_F",
-	"A3_Air_F_Heli_Light_01",
 	"A3_Ui_F",
-	"A3_Soft_F_Quadbike_01"
+	"A3_Air_F_Heli_Heli_Transport_04",
+	"A3_Air_F_Beta_Heli_Attack_02",
+	"A3_Air_F_Heli_Light_02",
+	"A3_Air_F_Heli_Light_01"
 };
 class AddonsMetaData
 {
@@ -38,45 +39,92 @@ class AddonsMetaData
 		items=5;
 		class Item0
 		{
-			className="A3_Air_F_Exp";
-			name="Arma 3 Apex - Aircrafts";
-			author="Bohemia Interactive";
-			url="https://www.arma3.com";
-		};
-		class Item1
-		{
 			className="A3_Characters_F";
 			name="Arma 3 Alpha - Characters and Clothing";
 			author="Bohemia Interactive";
 			url="https://www.arma3.com";
 		};
-		class Item2
-		{
-			className="A3_Air_F";
-			name="Arma 3 Alpha - Aircrafts";
-			author="Bohemia Interactive";
-			url="https://www.arma3.com";
-		};
-		class Item3
+		class Item1
 		{
 			className="A3_Ui_F";
 			name="Arma 3 - User Interface";
 			author="Bohemia Interactive";
 			url="https://www.arma3.com";
 		};
+		class Item2
+		{
+			className="A3_Air_F_Heli";
+			name="Arma 3 Helicopters - Aircrafts";
+			author="Bohemia Interactive";
+			url="https://www.arma3.com";
+		};
+		class Item3
+		{
+			className="A3_Air_F_Beta";
+			name="Arma 3 Beta - Aircrafts";
+			author="Bohemia Interactive";
+			url="https://www.arma3.com";
+		};
 		class Item4
 		{
-			className="A3_Soft_F";
-			name="Arma 3 Alpha - Unarmored Land Vehicles";
+			className="A3_Air_F";
+			name="Arma 3 Alpha - Aircrafts";
 			author="Bohemia Interactive";
 			url="https://www.arma3.com";
 		};
 	};
 };
-randomSeed=1573043;
+randomSeed=10533220;
 class ScenarioData
 {
 	author="xdannil";
+	respawn=3;
+	respawnDelay=13.750101;
+	respawnVehicleDelay=13.750101;
+};
+class CustomAttributes
+{
+	class Category0
+	{
+		name="Multiplayer";
+		class Attribute0
+		{
+			property="RespawnTemplates";
+			expression="true";
+			class Value
+			{
+				class data
+				{
+					class type
+					{
+						type[]=
+						{
+							"ARRAY"
+						};
+					};
+					class value
+					{
+						items=1;
+						class Item0
+						{
+							class data
+							{
+								class type
+								{
+									type[]=
+									{
+										"STRING"
+									};
+								};
+								value="Counter";
+							};
+						};
+					};
+				};
+			};
+		};
+		nAttributes=1;
+	};
 };
 class Mission
 {
@@ -86,28 +134,79 @@ class Mission
 		startWeather=0.30000001;
 		startWind=0.1;
 		startWaves=0.1;
-		forecastWeather=0.30000001;
+		forecastWeather=0;
 		forecastWind=0.1;
 		forecastWaves=0.1;
 		forecastLightnings=0.1;
 		year=2035;
 		month=6;
-		day=24;
+		day=6;
 		hour=12;
 		minute=0;
+		startFogBase=250;
+		forecastFogBase=250;
 		startFogDecay=0.014;
 		forecastFogDecay=0.014;
 	};
 	class Entities
 	{
-		items=9;
+		items=13;
 		class Item0
+		{
+			dataType="Group";
+			side="East";
+			class Entities
+			{
+				items=1;
+				class Item0
+				{
+					dataType="Object";
+					class PositionInfo
+					{
+						position[]={9959.4238,112.07184,9499.1299};
+					};
+					side="East";
+					flags=7;
+					class Attributes
+					{
+						isPlayer=1;
+					};
+					id=3;
+					type="O_Soldier_GL_F";
+					atlOffset=-7.6293945e-006;
+				};
+			};
+			class Attributes
+			{
+			};
+			id=2;
+			atlOffset=-7.6293945e-006;
+		};
+		class Item1
+		{
+			dataType="Marker";
+			position[]={5764.853,0,4796.708};
+			name="respawn_west";
+			type="mil_start";
+			id=4;
+			atlOffset=-6.2039051;
+		};
+		class Item2
+		{
+			dataType="Marker";
+			position[]={12791.417,0,4540.6592};
+			name="respawn_east_1";
+			type="mil_objective";
+			id=5;
+			atlOffset=-7.5850124;
+		};
+		class Item3
 		{
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={7922.0776,32.597443,9501.2217};
-				angles[]={0,0.0033601085,0};
+				position[]={5761.541,11.144576,4840.6523};
+				angles[]={6.1769209,0,0.055942677};
 			};
 			side="Empty";
 			flags=4;
@@ -115,243 +214,132 @@ class Mission
 			{
 			};
 			id=6;
-			type="C_Plane_Civil_01_F";
-			atlOffset=-0.04977417;
-		};
-		class Item1
-		{
-			dataType="Logic";
-			class PositionInfo
-			{
-				position[]={7291.9668,104.84348,8617.5361};
-				angles[]={0.083803542,0,0.032789111};
-			};
-			name="HC1";
-			isPlayable=1;
-			id=7;
-			type="HeadlessClient_F";
-			atlOffset=7.6293945e-006;
-		};
-		class Item2
-		{
-			dataType="Group";
-			side="West";
-			class Entities
-			{
-				items=1;
-				class Item0
-				{
-					dataType="Object";
-					class PositionInfo
-					{
-						position[]={5985.394,174.04567,10057.901};
-					};
-					side="West";
-					flags=7;
-					class Attributes
-					{
-						isPlayable=1;
-					};
-					id=10;
-					type="B_soldier_AT_F";
-					class CustomAttributes
-					{
-						class Attribute0
-						{
-							property="speaker";
-							expression="_this setspeaker _value;";
-							class Value
-							{
-								class data
-								{
-									class type
-									{
-										type[]=
-										{
-											"STRING"
-										};
-									};
-									value="Male06ENG";
-								};
-							};
-						};
-						class Attribute1
-						{
-							property="pitch";
-							expression="_this setpitch _value;";
-							class Value
-							{
-								class data
-								{
-									class type
-									{
-										type[]=
-										{
-											"SCALAR"
-										};
-									};
-									value=0.95999998;
-								};
-							};
-						};
-						nAttributes=2;
-					};
-				};
-			};
-			class Attributes
-			{
-			};
-			id=9;
-		};
-		class Item3
-		{
-			dataType="Object";
-			class PositionInfo
-			{
-				position[]={6475.4482,253.3895,8053.8394};
-				angles[]={6.1292138,0,6.236021};
-			};
-			side="Empty";
-			flags=4;
-			class Attributes
-			{
-			};
-			id=11;
-			type="B_Heli_Light_01_dynamicLoadout_F";
-			atlOffset=-0.17759705;
+			type="O_Heli_Transport_04_F";
+			atlOffset=-5.4359436e-005;
 		};
 		class Item4
 		{
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={5803.7065,217.02817,10204.524};
-				angles[]={0.013597663,0,6.2631893};
+				position[]={5780.0977,10.841267,4828.7231};
+				angles[]={0.013332055,0,0.0026520467};
 			};
 			side="Empty";
 			flags=4;
 			class Attributes
 			{
 			};
-			id=12;
-			type="B_Heli_Light_01_dynamicLoadout_F";
-			atlOffset=-0.085830688;
+			id=7;
+			type="O_Heli_Attack_02_dynamicLoadout_F";
+			atlOffset=2.8610229e-006;
 		};
 		class Item5
 		{
-			dataType="Marker";
-			position[]={1282.7686,-278.79297,12047.153};
-			name="trafficMarker";
-			markerType="ELLIPSE";
-			type="ellipse";
-			a=1500;
-			b=1000;
-			id=13;
-			atlOffset=-279.19711;
+			dataType="Object";
+			class PositionInfo
+			{
+				position[]={5763.9438,8.5158091,4800.4058};
+				angles[]={0.023993526,0,0.02399601};
+			};
+			side="Empty";
+			flags=4;
+			class Attributes
+			{
+			};
+			id=8;
+			type="O_Heli_Light_02_dynamicLoadout_F";
+			atlOffset=-2.3841858e-006;
 		};
 		class Item6
 		{
-			dataType="Group";
-			side="West";
-			class Entities
+			dataType="Object";
+			class PositionInfo
 			{
-				items=1;
-				class Item0
-				{
-					dataType="Object";
-					class PositionInfo
-					{
-						position[]={6009.1758,173.09836,10042.822};
-					};
-					side="West";
-					flags=7;
-					class Attributes
-					{
-						isPlayer=1;
-					};
-					id=15;
-					type="B_engineer_F";
-					class CustomAttributes
-					{
-						class Attribute0
-						{
-							property="speaker";
-							expression="_this setspeaker _value;";
-							class Value
-							{
-								class data
-								{
-									class type
-									{
-										type[]=
-										{
-											"STRING"
-										};
-									};
-									value="Male05ENG";
-								};
-							};
-						};
-						class Attribute1
-						{
-							property="pitch";
-							expression="_this setpitch _value;";
-							class Value
-							{
-								class data
-								{
-									class type
-									{
-										type[]=
-										{
-											"SCALAR"
-										};
-									};
-									value=1.04;
-								};
-							};
-						};
-						nAttributes=2;
-					};
-				};
+				position[]={5745.2793,8.2390957,4813.6934};
+				angles[]={6.2086568,0,0.034654226};
 			};
+			side="Empty";
+			flags=4;
 			class Attributes
 			{
 			};
-			id=14;
+			id=9;
+			type="O_Heli_Light_02_unarmed_F";
+			atlOffset=-4.1007996e-005;
 		};
 		class Item7
 		{
-			dataType="Object";
-			class PositionInfo
-			{
-				position[]={6007.2681,175.04134,10045.822};
-				angles[]={6.186686,0,6.2751918};
-			};
-			side="Empty";
-			flags=4;
-			class Attributes
-			{
-			};
-			id=21;
-			type="B_Quadbike_01_F";
-			atlOffset=-1.5258789e-005;
+			dataType="Marker";
+			position[]={10832.945,-3.8096499,4979.3271};
+			name="respawn_east_2";
+			type="mil_objective";
+			id=10;
+			atlOffset=-7.5476885;
 		};
 		class Item8
+		{
+			dataType="Marker";
+			position[]={2181.8008,5.0253906,13217.18};
+			name="respawn_east_3";
+			type="mil_objective";
+			id=11;
+			atlOffset=-8.4246092;
+		};
+		class Item9
+		{
+			dataType="Marker";
+			position[]={3116.5203,0,4604.3252};
+			name="swTrafficMarker";
+			markerType="RECTANGLE";
+			type="rectangle";
+			a=2750;
+			b=4000;
+			angle=128.60794;
+			id=12;
+			atlOffset=25.16618;
+		};
+		class Item10
+		{
+			dataType="Marker";
+			position[]={9557.7617,-3.3291016,9860.3828};
+			name="mainTrafficMarker";
+			markerType="ELLIPSE";
+			type="rectangle";
+			a=4000;
+			b=5500;
+			angle=272.28391;
+			id=13;
+			atlOffset=-60.967514;
+		};
+		class Item11
+		{
+			dataType="Marker";
+			position[]={7586.7627,0,5156.9805};
+			name="marker_3";
+			markerType="ELLIPSE";
+			type="ellipse";
+			a=250;
+			b=250;
+			id=14;
+			atlOffset=28.983641;
+		};
+		class Item12
 		{
 			dataType="Object";
 			class PositionInfo
 			{
-				position[]={5998.4419,175.12187,10029.268};
-				angles[]={6.2583928,0,0.0087958695};
+				position[]={9966.2559,112.35702,9503.3486};
+				angles[]={0.053283807,0,6.253861};
 			};
 			side="Empty";
 			flags=4;
 			class Attributes
 			{
 			};
-			id=27;
-			type="B_Heli_Light_01_dynamicLoadout_F";
+			id=20;
+			type="C_Heli_Light_01_civil_F";
+			atlOffset=0.010528564;
 		};
 	};
 };

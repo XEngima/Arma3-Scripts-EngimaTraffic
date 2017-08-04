@@ -1,5 +1,5 @@
 ENGIMA_TRAFFIC_MoveVehicle = {
-	params ["_currentInstanceIndex", "_vehicle", ["_firstDestinationPos", []], ["_debug", false]];
+	params ["_currentInstanceIndex", "_vehicle", "_areaMarkerName", ["_firstDestinationPos", []], ["_debug", false]];
 
     private ["_speed", "_roadSegments", "_destinationSegment"];
     private ["_destinationPos"];
@@ -20,6 +20,20 @@ ENGIMA_TRAFFIC_MoveVehicle = {
         _destinationSegment = selectRandom _roadSegments;
         _destinationPos = getPos _destinationSegment;
         
+        if (_areaMarkerName == "") then {
+	        _destinationPos = [getPos _vehicle, _destinationPos] call ENGIMA_TRAFFIC_GetPosThisIsland;
+	        private _segments = _destinationPos nearRoads 250;
+	        private _tries = 0;
+	        if (count _segments > 0) then {
+	        	while { [_destinationSegment] call ENGIMA_TRAFFIC_GetRoadSegmentWidth < 20 && _tries < 10 } do {
+		        	_destinationSegment = selectRandom _segments;
+		        	_tries = _tries + 1;
+	        	};
+	        	
+	        	_destinationPos = getPos _destinationSegment;
+	        };
+        };
+		            
         if (isNil "ENGIMA_TRAFFIC_MarkerNo") then { ENGIMA_TRAFFIC_MarkerNo = 1 };
         private _marker = createMarker ["ENGIMA_TRAFFIC_Marker_" + str ENGIMA_TRAFFIC_MarkerNo, _destinationPos];
         _marker setMarkerShape "ICON";
@@ -40,6 +54,6 @@ ENGIMA_TRAFFIC_MoveVehicle = {
     _waypoint setWaypointBehaviour "SAFE";
     _waypoint setWaypointSpeed _speed;
     _waypoint setWaypointCompletionRadius 10;
-    _waypoint setWaypointStatements ["true", "_nil = [" + str _currentInstanceIndex + ", " + vehicleVarName _vehicle + ", [], " + str _debug + "] spawn ENGIMA_TRAFFIC_MoveVehicle;"];
+    _waypoint setWaypointStatements ["true", "_nil = [" + str _currentInstanceIndex + ", " + vehicleVarName _vehicle + ", """ + _areaMarkerName + """, [], " + str _debug + "] spawn ENGIMA_TRAFFIC_MoveVehicle;"];
     _group setBehaviour "SAFE";
 };
