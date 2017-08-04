@@ -1,5 +1,18 @@
 if (!isNil "ENGIMA_TRAFFIC_functionsInitialized") exitWith {};
 
+// Deletes all waypoints from a group.
+// _group (Group): The group to delete all waypoints from.
+ENGIMA_TRAFFIC_DeleteAllWaypointsFromGroup = {
+	params ["_group"];
+	private ["_waypoints", "_i"];
+	
+	_waypoints = waypoints _group;
+	
+	for [{_i = (count _waypoints) - 1}, {_i >= 0}, {_i = _i - 1}] do {
+		deleteWaypoint [_group, _i];
+	} 
+};
+
 ENGIMA_TRAFFIC_FindEdgeRoads = {
 	private ["_minTopLeftDistances", "_minTopRightDistances", "_minBottomRightDistances", "_minBottomLeftDistances"];
 	private ["_worldTrigger", "_worldSize", "_mapTopLeftPos", "_mapTopRightPos", "_mapBottomRightPos", "_mapBottomLeftPos", "_i", "_nextStartPos", "_segmentsCount"];
@@ -103,55 +116,6 @@ ENGIMA_TRAFFIC_FindEdgeRoads = {
 	ENGIMA_TRAFFIC_edgeRoadsInitialized = true;
 };
 
-ENGIMA_TRAFFIC_MoveVehicle = {
-	params ["_currentInstanceIndex", "_vehicle", ["_firstDestinationPos", []], ["_debug", false]];
-
-    private ["_speed", "_roadSegments", "_destinationSegment"];
-    private ["_destinationPos"];
-    private ["_waypoint", "_fuel"];
-    
-    // Set fuel to something in between 0.3 and 0.9.
-    _fuel = 0.3 + random (0.9 - 0.3);
-    _vehicle setFuel _fuel;
-    
-    if (count _firstDestinationPos > 0) then {
-        _destinationPos = +_firstDestinationPos;
-    }
-    else {
-		_roadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex;
-		
-        _destinationSegment = selectRandom _roadSegments;
-        _destinationPos = getPos _destinationSegment;
-        private _currentPos = getPos _vehicle;
-        private _tries = 0;
-        
-		while { _destinationPos distance2D _currentPos > 1000 && _tries < 50 } do {
-	        _destinationSegment = selectRandom _roadSegments;
-	        _destinationPos = getPos _destinationSegment;
-	        _tries = _tries + 1;
-	        sleep 0.02;
-		};
-    };
-    
-    if (isNil "ENG_destinationMarkerNo") then {
-    	ENG_destinationMarkerNo = 1;
-    };
-    
-    _speed = "NORMAL";
-    if (_vehicle distance _destinationPos < 500) then {
-        _speed = "LIMITED";
-    };
-    
-    private _group = group _vehicle;
-    
-    _waypoint = _group addWaypoint [_destinationPos, 10];
-    _waypoint setWaypointBehaviour "SAFE";
-    _waypoint setWaypointSpeed _speed;
-    _waypoint setWaypointCompletionRadius 10;
-    _waypoint setWaypointStatements ["true", "_nil = [" + str _currentInstanceIndex + ", " + vehicleVarName _vehicle + ", [], " + str _debug + "] spawn ENGIMA_TRAFFIC_MoveVehicle;"];
-    _group setBehaviour "SAFE";
-};
-
 ENGIMA_TRAFFIC_FindSpawnSegment = {
     params ["_currentInstanceIndex", "_allPlayerPositions", "_minSpawnDistance", "_maxSpawnDistance", "_activeVehicles"];
     private ["_insideMarker", "_areaMarkerName", "_refPlayerPos", "_roadSegments", "_roadSegment", "_isOk", "_tries", "_result", "_spawnDistanceDiff", "_refPosX", "_refPosY", "_dir", "_tooFarAwayFromAll", "_tooClose", "_tooCloseToAnotherVehicle"];
@@ -245,6 +209,41 @@ ENGIMA_TRAFFIC_FindSpawnSegment = {
     _result
 };
 
+ENGIMA_TRAFFIC_RoadsConnected = {
+	params ["_thisSegment", "_targetSegment", ["_visitedSegments", []]];
+	
+	scopeName "main";
+	
+	if (isNil "ENGIMA_TRAFFIC_MarkerNo") then {
+		ENGIMA_TRAFFIC_MarkerNo = 1;
+	};
+	
+	/*
+	private _marker = createMarker ["ENGIMA_TRAFFIC_TraceMarker" + str ENGIMA_TRAFFIC_MarkerNo, getPos _thisSegment];
+	_marker setMarkerShape "ICON";
+	_marker setMarkerType "hd_dot";
+	ENGIMA_TRAFFIC_MarkerNo = ENGIMA_TRAFFIC_MarkerNo + 1;
+	*/
+	if (_thisSegment == _targetSegment) then {
+		//_marker setMarkerColor "ColorBlue";
+		true breakOut "main";
+	};
+	
+	_visitedSegments pushBack _thisSegment;
+	
+	private _connectedSegments = roadsConnectedTo _thisSegment;
+	
+	{
+		if (!(_x in _visitedSegments)) then {
+			if ([_x, _targetSegment, _visitedSegments] call ENGIMA_TRAFFIC_RoadsConnected) then {
+				true breakOut "main";
+			};
+		};
+	} foreach _connectedSegments;
+	
+	false
+};
+
 ENGIMA_TRAFFIC_StartTraffic = {
 	private ["_allPlayerPositions", "_allPlayerPositionsTemp", "_activeVehicles", "_mobileVehiclesCount", "_vehiclesGroup", "_spawnSegment", "_vehicle", "_group", "_result", "_vehicleClassName", "_vehiclesCrew", "_skill", "_minDistance", "_trafficLocation"];
 	private ["_currentEntityNo", "_vehicleVarName", "_tempVehicles", "_deletedVehiclesCount", "_firstIteration", "_roadSegments", "_destinationSegment", "_destinationPos", "_direction"];
@@ -292,19 +291,22 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	
 	_activeVehicles = [];
 	
-	/*
-	private _closeCircleMarker = createMarkerLocal ["ENG_CloseMarker", getPos vehicle player];
-	_closeCircleMarker setMarkerShapeLocal "ELLIPSE";
-	_closeCircleMarker setMarkerSizeLocal [_minSpawnDistance, _minSpawnDistance];
-	_closeCircleMarker setMarkerColorLocal "ColorRed";
-	_closeCircleMarker setMarkerBrushLocal "Border";
+	private _closeCircleMarker = "";
+	private _farCircleMarker = "";
 	
-	private _farCircleMarker = createMarkerLocal ["ENG_FarMarker", getPos vehicle player];
-	_farCircleMarker setMarkerShapeLocal "ELLIPSE";
-	_farCircleMarker setMarkerSizeLocal [_maxSpawnDistance, _maxSpawnDistance];
-	_farCircleMarker setMarkerColorLocal "ColorBlue";
-	_farCircleMarker setMarkerBrushLocal "Border";
-	*/
+	if (_debug) then {
+		_closeCircleMarker = createMarkerLocal ["ENG_CloseMarker", getPos vehicle player];
+		_closeCircleMarker setMarkerShapeLocal "ELLIPSE";
+		_closeCircleMarker setMarkerSizeLocal [_minSpawnDistance, _minSpawnDistance];
+		_closeCircleMarker setMarkerColorLocal "ColorRed";
+		_closeCircleMarker setMarkerBrushLocal "Border";
+		
+		_farCircleMarker = createMarkerLocal ["ENG_FarMarker", getPos vehicle player];
+		_farCircleMarker setMarkerShapeLocal "ELLIPSE";
+		_farCircleMarker setMarkerSizeLocal [_maxSpawnDistance, _maxSpawnDistance];
+		_farCircleMarker setMarkerColorLocal "ColorBlue";
+		_farCircleMarker setMarkerBrushLocal "Border";
+	};
 	
 	_firstIteration = true;
 	
@@ -324,12 +326,11 @@ ENGIMA_TRAFFIC_StartTraffic = {
 					private _aheadPos = _pos getPos [(speed vehicle _x) * 3.6, getDir _x];
 					_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _aheadPos]];
 					
-					/*
-					if (_x == player) then {
+					if (_debug && { _x == player }) then {
 						_closeCircleMarker setMarkerPosLocal _pos;
 						_farCircleMarker setMarkerPosLocal _aheadPos;
 					};
-					*/
+					
 				};
 			} foreach (playableUnits);
 		}
@@ -339,10 +340,10 @@ ENGIMA_TRAFFIC_StartTraffic = {
 			
 			_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _aheadPos]];
 			
-			/*
-			_closeCircleMarker setMarkerPosLocal _pos;
-			_farCircleMarker setMarkerPosLocal _aheadPos;
-			*/
+			if (_debug) then {
+				_closeCircleMarker setMarkerPosLocal _pos;
+				_farCircleMarker setMarkerPosLocal _aheadPos;
+			};			
 		};
 	
 		if (count _allPlayerPositionsTemp > 0) then {
@@ -409,8 +410,10 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	                _closestUnitDistance = _distance;
 	                
 	                if (_closestUnitDistance < _maxSpawnDistance || (_closePos distance2D _vehicle) < _closePos distance2D _farPos) then {
-	                	_keepVehicle = true;
-	                	breakOut "current";
+	                	if (canMove _vehicle || _closestUnitDistance < _minSpawnDistance) then {
+		                	_keepVehicle = true;
+		                	breakOut "current";
+	                	};
 	                };
 	            };
 	            
@@ -477,26 +480,34 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	        
 	            // Get first destination
 	            _trafficLocation = floor random 5;
+	            private _allRoadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex;
 	            switch (_trafficLocation) do {
 	                case 0: { _roadSegments = (getPos (ENGIMA_TRAFFIC_edgeBottomLeftRoads select _currentInstanceIndex)) nearRoads 100; };
 	                case 1: { _roadSegments = (getPos (ENGIMA_TRAFFIC_edgeTopLeftRoads select _currentInstanceIndex)) nearRoads 100; };
 	                case 2: { _roadSegments = (getPos (ENGIMA_TRAFFIC_edgeTopRightRoads select _currentInstanceIndex)) nearRoads 100; };
 	                case 3: { _roadSegments = (getPos (ENGIMA_TRAFFIC_edgeBottomRightRoads select _currentInstanceIndex)) nearRoads 100; };
-	                default { _roadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex };
+	                default { _roadSegments = _allRoadSegments };
 	            };
 	            
-	            _destinationSegment = selectRandom _roadSegments;
-	            _destinationPos = getPos _destinationSegment;
-
-		        private _currentPos = getPos _vehicle;
-		        private _tries = 0;
-		        
-				while { _destinationPos distance2D _currentPos > 1500 && _tries < 20 } do {
-			        _destinationSegment = selectRandom _roadSegments;
-			        _destinationPos = getPos _destinationSegment;
-			        _tries = _tries + 1;
-			        sleep 0.02;
-				};
+		        if (_areaMarkerName == "") then {
+		            _destinationSegment = selectRandom _roadSegments;
+		            _destinationPos = getPos _destinationSegment;
+		            
+			        //_destinationSegment = selectRandom _roadSegments; //(_currentPos nearRoads 2000);
+			        //_destinationPos = getPos _destinationSegment;
+		        }
+		        else {
+		            _destinationSegment = selectRandom _roadSegments;
+		            _destinationPos = getPos _destinationSegment;
+/*
+					while { _destinationPos distance2D _currentPos > 2000 && _tries < 25 } do {
+				        _tries = _tries + 1;
+				        _destinationSegment = selectRandom _allRoadSegments; //(_currentPos nearRoads 1500);
+				        _destinationPos = getPos _destinationSegment;
+				        //sleep 0.01;
+					};
+*/
+		        };
 
 	            _direction = ((_destinationPos select 0) - (getPos _spawnSegment select 0)) atan2 ((_destinationPos select 1) - (getpos _spawnSegment select 1));
 	            _roadSegmentDirection = getDir _spawnSegment;
@@ -588,14 +599,14 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		            
 		            // Name vehicle
 		            sleep random 0.1;
-		            if (isNil "dre_MilitaryTraffic_CurrentEntityNo") then {
-		                dre_MilitaryTraffic_CurrentEntityNo = 0
+		            if (isNil "ENGIMA_TRAFFIC_CurrentEntityNo") then {
+		                ENGIMA_TRAFFIC_CurrentEntityNo = 0
 		            };
 		            
-		            _currentEntityNo = dre_MilitaryTraffic_CurrentEntityNo;
-		            dre_MilitaryTraffic_CurrentEntityNo = dre_MilitaryTraffic_CurrentEntityNo + 1;
+		            _currentEntityNo = ENGIMA_TRAFFIC_CurrentEntityNo;
+		            ENGIMA_TRAFFIC_CurrentEntityNo = ENGIMA_TRAFFIC_CurrentEntityNo + 1;
 		            
-		            _vehicleVarName = "dre_MilitaryTraffic_Entity_" + str _currentEntityNo;
+		            _vehicleVarName = "ENGIMA_TRAFFIC_Entity_" + str _currentEntityNo;
 		            _vehicle setVehicleVarName _vehicleVarName;
 		            _vehicle call compile format ["%1=_this;", _vehicleVarName];
 		            sleep 0.01;
@@ -607,7 +618,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 			            sleep 0.01;
 		            } foreach _vehiclesCrew;
 		            
-		            _debugMarkerName = "dre_MilitaryTraffic_DebugMarker" + str _currentEntityNo;
+		            _debugMarkerName = "ENGIMA_TRAFFIC_DebugMarker" + str _currentEntityNo;
 		            
 		            // Start vehicle
 		            [_currentInstanceIndex, _vehicle, _destinationPos, _debug] spawn ENGIMA_TRAFFIC_MoveVehicle;
@@ -635,18 +646,31 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		            _debugMarkerName = _x select 3;
 		            _side = side _group;
 		            
-		            _debugMarkerColor = "Default";
-		            if (_side == west) then {
-		                _debugMarkerColor = "ColorBlufor";
-		            };
-		            if (_side == east) then {
-		                _debugMarkerColor = "ColorOpfor";
-		            };
-		            if (_side == civilian) then {
-		                _debugMarkerColor = "ColorCivilian";
-		            };
-		            if (_side == resistance) then {
-		                _debugMarkerColor = "ColorIndependent";
+		            _debugMarkerColor = _vehicle getVariable ["MarkerColor", "Default"];
+		            
+		            //_debugMarkerColor = "Default";
+		            if (_debugMarkerColor == "Default") then {
+			            if (_side == west) then {
+			                _debugMarkerColor = "ColorBlufor";
+			            };
+			            if (_side == east) then {
+			                _debugMarkerColor = "ColorOpfor";
+			            };
+			            if (_side == civilian) then {
+			                _debugMarkerColor = "ColorCivilian";
+			            };
+			            if (_side == resistance) then {
+			                _debugMarkerColor = "ColorIndependent";
+			            };
+			            
+			            if (!canMove _vehicle) then {
+			            	_debugMarkerColor = "ColorBlack";
+			            }
+			            else {
+			            	if (vehicle driver _vehicle != _vehicle) then {
+				            	_debugMarkerColor = "ColorGrey";
+			            	};
+			            };
 		            };
 		            
 		            [_debugMarkerName, getPos (_vehicle), "mil_dot", _debugMarkerColor, "Traffic"] call ENGIMA_TRAFFIC_SetDebugMarkerAllClients;
