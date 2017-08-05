@@ -33,14 +33,18 @@
                     <IsSelected>false</IsSelected>
                     <SubNodes />
                   </ProjectNodeViewModel>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="StartTraffic.sqf" IsExpanded="false" FileName="Engima\Traffic\Server\StartTraffic.sqf">
+                    <IsSelected>false</IsSelected>
+                    <SubNodes />
+                  </ProjectNodeViewModel>
                 </SubNodes>
               </ProjectNodeViewModel>
               <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="ConfigAndStart.sqf" IsExpanded="false" FileName="Engima\Traffic\ConfigAndStart.sqf">
-                <IsSelected>false</IsSelected>
+                <IsSelected>true</IsSelected>
                 <SubNodes />
               </ProjectNodeViewModel>
               <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Documentation.txt" IsExpanded="false" FileName="Engima\Traffic\Documentation.txt">
-                <IsSelected>true</IsSelected>
+                <IsSelected>false</IsSelected>
                 <SubNodes />
               </ProjectNodeViewModel>
               <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="HeadlessClient.sqf" IsExpanded="false" FileName="Engima\Traffic\HeadlessClient.sqf">
@@ -65,5 +69,9 @@
       </ProjectNodeViewModel>
     </SubNodes>
   </ProjectRootNode>
-  <FilteredAnalyzerResultItems />
+  <FilteredAnalyzerResultItems>
+    <string>Public variable 'ENGIMA_TRAFFIC_instanceIndex' may be used before being assigned a value.</string>
+    <string>Public variable 'ENGIMA_TRAFFIC_RoadsConnected' may be used before being assigned a value.</string>
+    <string>Public variable 'ENGIMA_TRAFFIC_instanceIndex' may be used before being assigned a value.</string>
+  </FilteredAnalyzerResultItems>
 </Project>

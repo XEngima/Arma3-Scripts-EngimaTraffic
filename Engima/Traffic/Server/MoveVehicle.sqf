@@ -24,13 +24,13 @@ ENGIMA_TRAFFIC_MoveVehicle = {
 	        _destinationPos = [getPos _vehicle, _destinationPos] call ENGIMA_TRAFFIC_GetPosThisIsland;
 	        private _segments = _destinationPos nearRoads 250;
 	        private _tries = 0;
+
 	        if (count _segments > 0) then {
-	        	while { [_destinationSegment] call ENGIMA_TRAFFIC_GetRoadSegmentWidth < 20 && _tries < 10 } do {
+	        	while { !(isOnRoad _destinationPos) && _tries < 10 } do {
 		        	_destinationSegment = selectRandom _segments;
+		        	_destinationPos = getPos _destinationSegment;
 		        	_tries = _tries + 1;
 	        	};
-	        	
-	        	_destinationPos = getPos _destinationSegment;
 	        };
         };
 		            
