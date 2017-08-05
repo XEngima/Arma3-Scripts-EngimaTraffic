@@ -13,8 +13,6 @@ ENGIMA_TRAFFIC_MoveVehicle = {
         _destinationPos = +_firstDestinationPos;
     }
     else {
-    	player sideChat (vehicleVarName _vehicle) + " framme!";
-    	_vehicle setVariable ["MarkerColor", "ColorRed"];
 		_roadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex;
 		
         _destinationSegment = selectRandom _roadSegments;
@@ -33,13 +31,15 @@ ENGIMA_TRAFFIC_MoveVehicle = {
 	        	};
 	        };
         };
-		            
+
+		/*
         if (isNil "ENGIMA_TRAFFIC_MarkerNo") then { ENGIMA_TRAFFIC_MarkerNo = 1 };
         private _marker = createMarker ["ENGIMA_TRAFFIC_Marker_" + str ENGIMA_TRAFFIC_MarkerNo, _destinationPos];
         _marker setMarkerShape "ICON";
         _marker setMarkerType "hd_dot";
         _marker setMarkerColor "ColorRed";
         ENGIMA_TRAFFIC_MarkerNo = ENGIMA_TRAFFIC_MarkerNo + 1;
+        */
     };
     
     _speed = "NORMAL";

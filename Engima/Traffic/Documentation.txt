@@ -1,5 +1,5 @@
 -------------------------------------
- - ENGIMA'S TRAFFIC (VERSION 1.52) -
+ - ENGIMA'S TRAFFIC (VERSION 1.6) -
 -------------------------------------
 
 Engima's Traffic is a scripts that adds traffic to an Arma 3 mission.
@@ -16,7 +16,10 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 
 --- VERSION HISTORY ---
 
-1.52:  Fixed: Many traffic units not moving on maps with many small islands (like Tanoa).
+1.6:   Improved traffic flow by removing immobile vehicles outside visual range.
+       Fixed: Many traffic units not moving at all on maps with several small islands (like Tanoa).
+       Fixed: Units get stuck on small paths in the woods (like on Tanoa). Paths are now ignored.
+       Fixed: Number of vehicles not relative to traffic area coverage.
 1.5:   Added callback ON_UNIT_CREATING which fires right before a vehicle spawns.
        Replaced callback ON_SPAWN_CALLBACK with ON_UNIT_CREATED.
        Replaced callback ON_REMOVE_CALLBACK with ON_UNIT_REMOVING.
@@ -86,8 +89,9 @@ Here is a complete list of the parameters and what they do:
   a vehicle is damage to a degree that it cannot move (!canMove vehicle), then it will not be counted, and a new 
   vehicle will be created. But only if allowed by MAX_GROUPS_COUNT (se below).
   Example: If in single player and VEHICLES_COUNT is set to 10, MAX_GROUPS_COUNT set to 15, and MAX_SPAWN_DISTANCE is 
-  set to 1000, then there will be 10 vehicles on an area of 3142 square meters (1000 * pi). If one of them gets damaged 
-  so it cannot move, then an 11th will spawn (and so on up to 15).
+  set to 1000, then there will be 10 vehicles on an area of 3.14 sqkm (1000^2 * pi). If one of them gets damaged 
+  so it cannot move, then an 11th will spawn (and so on up to 15). In a multiplayer game the vehicles will be spread
+  over total area covered by the players.
 
 * MAX_GROUPS_COUNT (Scalar): Maximum number of groups that the script will ever have created at the same time. If set
   to 0 (default) then the VEHICLES_COUNT value will be used. If set to a value greater than 0 and less than 
