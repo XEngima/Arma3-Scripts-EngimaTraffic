@@ -1,5 +1,5 @@
 -------------------------------------
- - ENGIMA'S TRAFFIC (VERSION 1.6) -
+ - ENGIMA'S TRAFFIC (VERSION 1.6.1) -
 -------------------------------------
 
 Engima's Traffic is a scripts that adds traffic to an Arma 3 mission.
@@ -16,6 +16,7 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 
 --- VERSION HISTORY ---
 
+1.6.1: Adjusted vehicle spawn distances.
 1.6:   Improved traffic flow by removing immobile vehicles outside visual range.
        Fixed: Many traffic units not moving at all on maps with several small islands (like Tanoa).
        Fixed: Units get stuck on small paths in the woods (like on Tanoa). Paths are now ignored.

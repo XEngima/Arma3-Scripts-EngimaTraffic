@@ -90,7 +90,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 			{
 				if (isPlayer _x) then {
 					private _pos = position vehicle _x;
-					private _aheadPos = _pos getPos [(speed vehicle _x) * 3.6, getDir _x];
+					private _aheadPos = _pos getPos [(speed vehicle _x) * 3, getDir _x];
 					_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _aheadPos]];
 					
 					if (_debug && { _x == player }) then {
@@ -103,7 +103,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		}
 		else {
 			private _pos = position vehicle player;
-			private _aheadPos = _pos getPos [(speed vehicle player) * 3.6, getDir player];
+			private _aheadPos = _pos getPos [(speed vehicle player) * 3, getDir player];
 			
 			_allPlayerPositionsTemp = _allPlayerPositionsTemp + [[_pos, _aheadPos]];
 			
