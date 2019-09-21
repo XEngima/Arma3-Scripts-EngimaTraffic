@@ -55,25 +55,6 @@ ENGIMA_TRAFFIC_CalculatePlayerMarkerCoverage = {
 	_sumCoveredShare
 };
 
-// Calculates how much area that is covered when blacklist markers are taken account of,
-// and takes all players and all blacklist markers in account.
-// _playerPositions (Array): All players' positions.
-// Returns (Scalar): The average share of area covered by blacklist markers. 0 = Nothing 
-// covered, 1 = all covered.
-/*
-ENGIMA_TRAFFIC_CalculateBlacklistCoverage = {
-	params ["_playerPositions" as Array];
-	
-	private _sumShare = 0;
-	
-	{
-		_sumShare = _sumShare + ([_x] call _self.CalculatePlayerBlacklistCoverage);
-	} foreach _playerPositions as Array;
-	
-	_sumShare / count _playerPositions
-};
-*/
-
 // Tests and calculates the width of a road segment.
 // _roadSegment (Object): The road segment to test for its width.
 // Returns (Scalar): The width of the road in meters.

@@ -16,6 +16,8 @@ Script works in singleplayer, multiplayer, hosted, dedicated for JIPs, and on an
 
 --- VERSION HISTORY ---
 
+1.7:   Fixed: The same car had different random texture on different clients. Now all players see the same texture on all cars.
+       Fixed: Script error when no players in the mission.
 1.6.1: Adjusted vehicle spawn distances.
 1.6:   Improved traffic flow by removing immobile vehicles outside visual range.
        Fixed: Many traffic units not moving at all on maps with several small islands (like Tanoa).
