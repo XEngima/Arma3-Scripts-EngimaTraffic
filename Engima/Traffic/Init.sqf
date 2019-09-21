@@ -4,7 +4,7 @@ call compile preprocessFileLineNumbers "Engima\Traffic\HeadlessClient.sqf";
 
 ENGIMA_TRAFFIC_instanceIndex = -1;
 ENGIMA_TRAFFIC_areaMarkerNames = [];
-ENGIMA_TRAFFIC_roadSegments = [];
+ENGIMA_TRAFFIC_roadSegmentPositions = [];
 ENGIMA_TRAFFIC_edgeTopLeftRoads = [];
 ENGIMA_TRAFFIC_edgeTopRightRoads = [];
 ENGIMA_TRAFFIC_edgeBottomRightRoads = [];

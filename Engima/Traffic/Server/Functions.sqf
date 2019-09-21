@@ -160,18 +160,18 @@ ENGIMA_TRAFFIC_FindEdgeRoads = {
 		_minBottomLeftDistances pushBack 1000000;
 	};
 	
-	ENGIMA_TRAFFIC_allRoadSegments = [0,0,0] nearRoads 1000000;
+	private _allRoadSegments = [0,0,0] nearRoads 1000000;
 	sleep 0.01;
-	_segmentsCount = count ENGIMA_TRAFFIC_allRoadSegments;
+	_segmentsCount = count _allRoadSegments;
 	
 	// Find all edge road segments
 	
 	_i = 0;
 	_nextStartPos = 1;
 	while { _i < _segmentsCount } do {
-		private ["_instanceIndex", "_road", "_roadPos", "_markerName", "_insideMarker", "_roads"];
+		private ["_instanceIndex", "_road", "_roadPos", "_markerName", "_insideMarker", "_roadPositions"];
 		
-		_road = ENGIMA_TRAFFIC_allRoadSegments select _i;
+		_road = _allRoadSegments select _i;
 		_roadPos = getPos _road;
 		
 		_instanceIndex = 0;
@@ -186,10 +186,10 @@ ENGIMA_TRAFFIC_FindEdgeRoads = {
 				};
 				
 				if (_insideMarker) then {
-					_roads = ENGIMA_TRAFFIC_roadSegments select _instanceIndex;
+					_roadPositions = ENGIMA_TRAFFIC_roadSegmentPositions select _instanceIndex;
 					
 					if (isOnRoad getPos _road) then { // A path is not a road (like on Tanoa).
-						_roads pushBack _road;
+						_roadPositions pushBack getPos _road;
 					
 						// Top left
 						if (_roadPos distance _mapTopLeftPos < (_minTopLeftDistances select _instanceIndex)) then {

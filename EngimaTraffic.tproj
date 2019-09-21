@@ -1,77 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <ProjectRootNode Name="EngimaTraffic" IsExpanded="true" FileName="">
-    <IsSelected>false</IsSelected>
+  <ProjectRootNode Name="EngimaTraffic" FileName="">
     <SubNodes>
-      <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Engima" IsExpanded="true" FileName="Engima">
-        <IsSelected>false</IsSelected>
+      <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Engima" FileName="Engima">
         <SubNodes>
-          <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Traffic" IsExpanded="true" FileName="Engima\Traffic">
-            <IsSelected>false</IsSelected>
+          <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Traffic" FileName="Engima\Traffic">
             <SubNodes>
-              <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Common" IsExpanded="true" FileName="Engima\Traffic\Common">
-                <IsSelected>false</IsSelected>
+              <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Common" FileName="Engima\Traffic\Common">
                 <SubNodes>
-                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Common.sqf" IsExpanded="false" FileName="Engima\Traffic\Common\Common.sqf">
-                    <IsSelected>false</IsSelected>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Common.sqf" FileName="Engima\Traffic\Common\Common.sqf">
                     <SubNodes />
                   </ProjectNodeViewModel>
-                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Debug.sqf" IsExpanded="false" FileName="Engima\Traffic\Common\Debug.sqf">
-                    <IsSelected>false</IsSelected>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Debug.sqf" FileName="Engima\Traffic\Common\Debug.sqf">
                     <SubNodes />
                   </ProjectNodeViewModel>
                 </SubNodes>
               </ProjectNodeViewModel>
-              <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Server" IsExpanded="true" FileName="Engima\Traffic\Server">
-                <IsSelected>false</IsSelected>
+              <ProjectNodeViewModel xsi:type="ProjectFolderNodeViewModel" Name="Server" FileName="Engima\Traffic\Server">
                 <SubNodes>
-                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Functions.sqf" IsExpanded="false" FileName="Engima\Traffic\Server\Functions.sqf">
-                    <IsSelected>false</IsSelected>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Functions.sqf" FileName="Engima\Traffic\Server\Functions.sqf">
                     <SubNodes />
                   </ProjectNodeViewModel>
-                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="MoveVehicle.sqf" IsExpanded="false" FileName="Engima\Traffic\Server\MoveVehicle.sqf">
-                    <IsSelected>false</IsSelected>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="MoveVehicle.sqf" FileName="Engima\Traffic\Server\MoveVehicle.sqf">
                     <SubNodes />
                   </ProjectNodeViewModel>
-                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="StartTraffic.sqf" IsExpanded="false" FileName="Engima\Traffic\Server\StartTraffic.sqf">
-                    <IsSelected>false</IsSelected>
+                  <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="StartTraffic.sqf" FileName="Engima\Traffic\Server\StartTraffic.sqf">
                     <SubNodes />
                   </ProjectNodeViewModel>
                 </SubNodes>
               </ProjectNodeViewModel>
-              <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="ConfigAndStart.sqf" IsExpanded="false" FileName="Engima\Traffic\ConfigAndStart.sqf">
-                <IsSelected>false</IsSelected>
+              <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="ConfigAndStart.sqf" FileName="Engima\Traffic\ConfigAndStart.sqf">
                 <SubNodes />
               </ProjectNodeViewModel>
-              <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Documentation.txt" IsExpanded="false" FileName="Engima\Traffic\Documentation.txt">
-                <IsSelected>true</IsSelected>
+              <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="HeadlessClient.sqf" FileName="Engima\Traffic\HeadlessClient.sqf">
                 <SubNodes />
               </ProjectNodeViewModel>
-              <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="HeadlessClient.sqf" IsExpanded="false" FileName="Engima\Traffic\HeadlessClient.sqf">
-                <IsSelected>false</IsSelected>
-                <SubNodes />
-              </ProjectNodeViewModel>
-              <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Init.sqf" IsExpanded="false" FileName="Engima\Traffic\Init.sqf">
-                <IsSelected>false</IsSelected>
+              <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="Init.sqf" FileName="Engima\Traffic\Init.sqf">
                 <SubNodes />
               </ProjectNodeViewModel>
             </SubNodes>
           </ProjectNodeViewModel>
         </SubNodes>
       </ProjectNodeViewModel>
-      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="description.ext" IsExpanded="false" FileName="description.ext">
-        <IsSelected>false</IsSelected>
+      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="description.ext" FileName="description.ext">
         <SubNodes />
       </ProjectNodeViewModel>
-      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="init.sqf" IsExpanded="true" FileName="init.sqf">
-        <IsSelected>false</IsSelected>
+      <ProjectNodeViewModel xsi:type="ProjectFileNodeViewModel" Name="init.sqf" FileName="init.sqf">
         <SubNodes />
       </ProjectNodeViewModel>
     </SubNodes>
   </ProjectRootNode>
-  <FilteredAnalyzerResultItems>
-    <string>Public variable 'ENGIMA_TRAFFIC_instanceIndex' may be used before being assigned a value.</string>
-    <string>Public variable 'ENGIMA_TRAFFIC_RoadsConnected' may be used before being assigned a value.</string>
-    <string>Public variable 'ENGIMA_TRAFFIC_instanceIndex' may be used before being assigned a value.</string>
-  </FilteredAnalyzerResultItems>
+  <FilteredAnalyzerResultItems />
 </Project>

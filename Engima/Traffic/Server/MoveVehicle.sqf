@@ -1,7 +1,7 @@
 ENGIMA_TRAFFIC_MoveVehicle = {
 	params ["_currentInstanceIndex", "_vehicle", "_areaMarkerName", ["_firstDestinationPos", []], ["_debug", false]];
 
-    private ["_speed", "_roadSegments", "_destinationSegment"];
+    private ["_speed", "_roadSegmentPositions"];
     private ["_destinationPos"];
     private ["_waypoint", "_fuel"];
     
@@ -13,10 +13,8 @@ ENGIMA_TRAFFIC_MoveVehicle = {
         _destinationPos = +_firstDestinationPos;
     }
     else {
-		_roadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex;
-		
-        _destinationSegment = selectRandom _roadSegments;
-        _destinationPos = getPos _destinationSegment;
+		_roadSegmentPositions = ENGIMA_TRAFFIC_roadSegmentPositions select _currentInstanceIndex;
+        _destinationPos = selectRandom _roadSegmentPositions;
         
         if (_areaMarkerName == "") then {
 	        _destinationPos = [getPos _vehicle, _destinationPos] call ENGIMA_TRAFFIC_GetPosThisIsland;
@@ -25,8 +23,7 @@ ENGIMA_TRAFFIC_MoveVehicle = {
 
 	        if (count _segments > 0) then {
 	        	while { !(isOnRoad _destinationPos) && _tries < 10 } do {
-		        	_destinationSegment = selectRandom _segments;
-		        	_destinationPos = getPos _destinationSegment;
+		        	_destinationPos = getPos selectRandom _segments;
 		        	_tries = _tries + 1;
 	        	};
 	        };

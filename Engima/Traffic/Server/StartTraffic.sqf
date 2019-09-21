@@ -54,7 +54,7 @@ ENGIMA_TRAFFIC_StartTraffic = {
 	
 	ENGIMA_TRAFFIC_areaMarkerNames set [_currentInstanceIndex, _areaMarkerName];
 	ENGIMA_TRAFFIC_edgeRoadsUseful set [_currentInstanceIndex, false];
-	ENGIMA_TRAFFIC_roadSegments set [_currentInstanceIndex, []];
+	ENGIMA_TRAFFIC_roadSegmentPositions set [_currentInstanceIndex, []];
 	
 	_activeVehicles = [];
 	
@@ -255,20 +255,27 @@ ENGIMA_TRAFFIC_StartTraffic = {
 		        
 		            // Get first destination
 		            _trafficLocation = floor random 5;
-		            private _allRoadSegments = ENGIMA_TRAFFIC_roadSegments select _currentInstanceIndex;
+		            private _allRoadSegmentPositions = ENGIMA_TRAFFIC_roadSegmentPositions select _currentInstanceIndex;
 		            switch (_trafficLocation) do {
 		                case 0: { _roadSegments = (getPos (ENGIMA_TRAFFIC_edgeBottomLeftRoads select _currentInstanceIndex)) nearRoads 100; };
 		                case 1: { _roadSegments = (getPos (ENGIMA_TRAFFIC_edgeTopLeftRoads select _currentInstanceIndex)) nearRoads 100; };
 		                case 2: { _roadSegments = (getPos (ENGIMA_TRAFFIC_edgeTopRightRoads select _currentInstanceIndex)) nearRoads 100; };
 		                case 3: { _roadSegments = (getPos (ENGIMA_TRAFFIC_edgeBottomRightRoads select _currentInstanceIndex)) nearRoads 100; };
-		                default { _roadSegments = _allRoadSegments };
+		                default { _roadSegments = []; };
 		            };
 		            
-			        if (_areaMarkerName == "") then {
+		        	if (count _roadSegments == 0) then {
+			            _destinationPos = selectRandom _allRoadSegmentPositions;
+		        	}
+		        	else {
 			            _destinationSegment = selectRandom _roadSegments;
 			            _destinationPos = getPos _destinationSegment;
-			            
+		        	};
+		        	
+			        if (_areaMarkerName == "") then
+			        {
 			            _destinationPos = [getPos _spawnSegment, _destinationPos] call ENGIMA_TRAFFIC_GetPosThisIsland;
+			            
 			            private _segments = _destinationPos nearRoads 250;
 			            if (count _segments > 0) then {
 			            	_destinationSegment = selectRandom _segments;
@@ -283,10 +290,6 @@ ENGIMA_TRAFFIC_StartTraffic = {
 					    _marker setMarkerColor "ColorGreen";
 					    ENGIMA_TRAFFIC_LineMarkerNo = ENGIMA_TRAFFIC_LineMarkerNo + 1;
 						*/
-			        }
-			        else {
-			            _destinationSegment = selectRandom _roadSegments;
-			            _destinationPos = getPos _destinationSegment;
 			        };
 	
 		            _direction = ((_destinationPos select 0) - (getPos _spawnSegment select 0)) atan2 ((_destinationPos select 1) - (getpos _spawnSegment select 1));
